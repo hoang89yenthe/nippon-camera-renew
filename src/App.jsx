@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 
 // ════════════════════════════════════════════════════
 // CONSTANTS & MOCK DATABASE
@@ -33,6 +33,20 @@ const BRAND_SLOGANS = {
   'PHỤ KIỆN': 'Phụ kiện máy ảnh chất lượng'
 };
 
+// FIX #2: Magic strings → named constants
+const PRODUCT_STATUS = {
+  IN_STOCK: 'con-hang',
+  DEPOSITED: 'da-coc',
+  SOLD: 'da-ban',
+};
+
+const LOG_TYPE = {
+  IMPORT: 'nhap',
+  DEPOSIT: 'coc',
+  SELL: 'ban',
+  SYSTEM: 'he-thong',
+};
+
 const INITIAL_PRODUCTS = [
   {
     id: '37490',
@@ -40,7 +54,7 @@ const INITIAL_PRODUCTS = [
     name: 'X-M5',
     specs: 'Black, Body, No box / 37490',
     price: 21990000,
-    status: 'con-hang',
+    status: PRODUCT_STATUS.IN_STOCK,
     color: '#000000',
     box: false,
     lens: false,
@@ -59,7 +73,7 @@ const INITIAL_PRODUCTS = [
     name: 'X-T5',
     specs: 'Silver, Body, Fullbox / 37491',
     price: 38500000,
-    status: 'con-hang',
+    status: PRODUCT_STATUS.IN_STOCK,
     color: '#c0c0c0',
     box: true,
     lens: false,
@@ -78,7 +92,7 @@ const INITIAL_PRODUCTS = [
     name: 'X-T30 II',
     specs: 'Black, Kit 15-45mm, Fullbox / 37492',
     price: 23200000,
-    status: 'con-hang',
+    status: PRODUCT_STATUS.IN_STOCK,
     color: '#000000',
     box: true,
     lens: true,
@@ -97,7 +111,7 @@ const INITIAL_PRODUCTS = [
     name: 'X-S20',
     specs: 'Black, Body, Fullbox / 37493',
     price: 29900000,
-    status: 'con-hang',
+    status: PRODUCT_STATUS.IN_STOCK,
     color: '#000000',
     box: true,
     lens: false,
@@ -116,7 +130,7 @@ const INITIAL_PRODUCTS = [
     name: 'X100VI',
     specs: 'Silver, Fullbox, 100% / 37494',
     price: 49500000,
-    status: 'con-hang',
+    status: PRODUCT_STATUS.IN_STOCK,
     color: '#c0c0c0',
     box: true,
     lens: true,
@@ -135,7 +149,7 @@ const INITIAL_PRODUCTS = [
     name: 'X-Pro3',
     specs: 'Dura Black, Body, No box / 37495',
     price: 32500000,
-    status: 'con-hang',
+    status: PRODUCT_STATUS.IN_STOCK,
     color: '#3a3a3a',
     box: false,
     lens: false,
@@ -154,7 +168,7 @@ const INITIAL_PRODUCTS = [
     name: 'A7 IV',
     specs: 'Black, Body, Fullbox / 38490',
     price: 43200000,
-    status: 'con-hang',
+    status: PRODUCT_STATUS.IN_STOCK,
     color: '#000000',
     box: true,
     lens: false,
@@ -173,7 +187,7 @@ const INITIAL_PRODUCTS = [
     name: 'EOS R6 II',
     specs: 'Black, Body, Fullbox / 39490',
     price: 52000000,
-    status: 'con-hang',
+    status: PRODUCT_STATUS.IN_STOCK,
     color: '#000000',
     box: true,
     lens: false,
@@ -192,7 +206,7 @@ const INITIAL_PRODUCTS = [
     name: 'Osmo Pocket 3 Creator Combo',
     specs: 'Black, Full Combo, Fullbox / 40490',
     price: 13990000,
-    status: 'con-hang',
+    status: PRODUCT_STATUS.IN_STOCK,
     color: '#000000',
     box: true,
     lens: true,
@@ -211,7 +225,7 @@ const INITIAL_PRODUCTS = [
     name: 'Zfc',
     specs: 'Silver-Black, Kit 16-50mm, Fullbox / 41490',
     price: 16500000,
-    status: 'con-hang',
+    status: PRODUCT_STATUS.IN_STOCK,
     color: '#c0c0c0',
     box: true,
     lens: true,
@@ -230,7 +244,7 @@ const INITIAL_PRODUCTS = [
     name: 'GR III',
     specs: 'Black, Body, No box / 42490',
     price: 24500000,
-    status: 'con-hang',
+    status: PRODUCT_STATUS.IN_STOCK,
     color: '#000000',
     box: false,
     lens: true,
@@ -249,7 +263,7 @@ const INITIAL_PRODUCTS = [
     name: '24-70mm f/2.8 DG DN Art (Sony E)',
     specs: 'Black, Lens, Fullbox / 43490',
     price: 18500000,
-    status: 'con-hang',
+    status: PRODUCT_STATUS.IN_STOCK,
     color: '#000000',
     box: true,
     lens: true,
@@ -268,7 +282,7 @@ const INITIAL_PRODUCTS = [
     name: '28-75mm f/2.8 Di III VXD G2 (Sony E)',
     specs: 'Black, Lens, Fullbox / 44490',
     price: 16900000,
-    status: 'con-hang',
+    status: PRODUCT_STATUS.IN_STOCK,
     color: '#000000',
     box: true,
     lens: true,
@@ -287,7 +301,7 @@ const INITIAL_PRODUCTS = [
     name: '85mm f/1.8 II STM (Nikon Z)',
     specs: 'Black, Lens, Fullbox / 45490',
     price: 7500000,
-    status: 'con-hang',
+    status: PRODUCT_STATUS.IN_STOCK,
     color: '#000000',
     box: true,
     lens: true,
@@ -306,7 +320,7 @@ const INITIAL_PRODUCTS = [
     name: 'Leica Q2',
     specs: 'Black, Compact, Fullbox / 46490',
     price: 95000000,
-    status: 'con-hang',
+    status: PRODUCT_STATUS.IN_STOCK,
     color: '#000000',
     box: true,
     lens: true,
@@ -325,7 +339,7 @@ const INITIAL_PRODUCTS = [
     name: 'X2D 100C',
     specs: 'Dura Grey, Medium Format, Fullbox / 47490',
     price: 180000000,
-    status: 'con-hang',
+    status: PRODUCT_STATUS.IN_STOCK,
     color: '#3a3a3a',
     box: true,
     lens: false,
@@ -344,7 +358,7 @@ const INITIAL_PRODUCTS = [
     name: 'Chân máy Peak Design Carbon Travel Tripod',
     specs: 'Black, Carbon, Fullbox / 48490',
     price: 12500000,
-    status: 'con-hang',
+    status: PRODUCT_STATUS.IN_STOCK,
     color: '#000000',
     box: true,
     lens: false,
@@ -362,7 +376,7 @@ const INITIAL_PRODUCTS = [
 const INITIAL_HISTORY = [
   {
     id: 'hist_1',
-    type: 'nhap',
+    type: LOG_TYPE.IMPORT,
     date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
     staff: 'Nguyễn Việt Thịnh',
     location: '193 NBK',
@@ -372,7 +386,7 @@ const INITIAL_HISTORY = [
   },
   {
     id: 'hist_2',
-    type: 'nhap',
+    type: LOG_TYPE.IMPORT,
     date: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
     staff: 'Lê Hồng Quân',
     location: '193 Giảng Võ',
@@ -381,6 +395,33 @@ const INITIAL_HISTORY = [
     details: 'Nhập kho máy DJI Osmo Pocket 3 Creator Combo ngoại hình 99%.'
   }
 ];
+
+// FIX #3: Reusable status label/class lookup — eliminates repeated if-else chains
+const STATUS_DISPLAY = {
+  [PRODUCT_STATUS.IN_STOCK]:  { text: 'Còn hàng', cls: 'status-con' },
+  [PRODUCT_STATUS.DEPOSITED]: { text: 'Đã cọc',   cls: 'status-coc' },
+  [PRODUCT_STATUS.SOLD]:      { text: 'Đã bán',   cls: 'status-ban' },
+};
+
+const LOG_DISPLAY = {
+  [LOG_TYPE.IMPORT]:  { text: 'NHẬP KHO', cls: 'type-nhap' },
+  [LOG_TYPE.DEPOSIT]: { text: 'CỌC MÁY',  cls: 'type-coc'  },
+  [LOG_TYPE.SELL]:    { text: 'ĐÃ BÁN',   cls: 'type-ban'  },
+  [LOG_TYPE.SYSTEM]:  { text: 'HỆ THỐNG', cls: 'type-system' },
+};
+
+// FIX #8: Download utility extracted out of JSX/handlers
+function triggerJsonDownload(data, filename) {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
 
 export default function App() {
   // ════════════════════════════════════════════════════
@@ -403,7 +444,7 @@ export default function App() {
   const [priceFilter, setPriceFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [activeThumbIndex, setActiveThumbIndex] = useState(0);
-  
+
   // Modals state
   const [depositModalOpen, setDepositModalOpen] = useState(false);
   const [mDepStaff, setMDepStaff] = useState(STAFFS[0]);
@@ -428,8 +469,11 @@ export default function App() {
   const [fAccessories, setFAccessories] = useState('');
   const [fDesc, setFDesc] = useState('');
 
-  // Toast state
   const [toast, setToast] = useState(null);
+
+  // FIX #5 & #8: Refs instead of DOM queries
+  const toastTimerRef = useRef(null);
+  const importFileRef = useRef(null);
 
   // Sync to local storage
   useEffect(() => {
@@ -440,68 +484,69 @@ export default function App() {
     localStorage.setItem('nippon_camera_history', JSON.stringify(history));
   }, [history]);
 
-  // Check weekly expired deposits on mount
+  // FIX #5: Clear toast timer on unmount to prevent memory leak
   useEffect(() => {
-    const checkExpiredDeposits = () => {
-      let changed = false;
-      const oneWeekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
-      const updatedProducts = products.map(p => {
-        if (p.status === 'da-coc' && p.depositInfo && p.depositInfo.date) {
-          const depositTime = new Date(p.depositInfo.date).getTime();
-          if (depositTime < oneWeekAgo) {
-            changed = true;
-            const newLog = {
-              id: 'hist_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
-              type: 'he-thong',
-              date: new Date().toISOString(),
-              staff: 'Hệ thống',
-              location: p.depositInfo.location,
-              productName: `${p.brand} ${p.name}`,
-              serial: p.serial,
-              details: `Hệ thống tự động hủy cọc quá hạn 1 tuần (đặt bởi ${p.depositInfo.staff} tại ${p.depositInfo.location})`
-            };
-            setHistory(prev => [newLog, ...prev]);
-            
-            const updatedP = { ...p, status: 'con-hang' };
-            delete updatedP.depositInfo;
-            return updatedP;
-          }
-        }
-        return p;
-      });
-
-      if (changed) {
-        setProducts(updatedProducts);
-      }
+    return () => {
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
     };
-    checkExpiredDeposits();
+  }, []);
+
+  // FIX #1 & #7: Pure map — collect expired logs first, then batch-update both states
+  useEffect(() => {
+    const oneWeekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    const now = new Date().toISOString();
+    const expiredLogs = [];
+
+    const updatedProducts = products.map(p => {
+      if (p.status === PRODUCT_STATUS.DEPOSITED && p.depositInfo?.date) {
+        const depositTime = new Date(p.depositInfo.date).getTime();
+        if (depositTime < oneWeekAgo) {
+          expiredLogs.push({
+            id: `hist_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+            type: LOG_TYPE.SYSTEM,
+            date: now,
+            staff: 'Hệ thống',
+            location: p.depositInfo.location,
+            productName: `${p.brand} ${p.name}`,
+            serial: p.serial,
+            details: `Hệ thống tự động hủy cọc quá hạn 1 tuần (đặt bởi ${p.depositInfo.staff} tại ${p.depositInfo.location})`
+          });
+          // FIX: destructure instead of mutating with delete
+          const { depositInfo: _ignored, ...rest } = p;
+          return { ...rest, status: PRODUCT_STATUS.IN_STOCK };
+        }
+      }
+      return p;
+    });
+
+    if (expiredLogs.length > 0) {
+      setProducts(updatedProducts);
+      setHistory(prev => [...expiredLogs, ...prev]);
+    }
+    // products is stable at mount (read from localStorage before this effect runs).
+    // Intentionally run once on mount only.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Helpers
+  // FIX #5: Clear existing timer before starting a new one — no duplicate timers
   const showToast = (message, type = 'success') => {
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
     setToast({ message, type });
-    setTimeout(() => {
-      setToast(null);
-    }, 3000);
+    toastTimerRef.current = setTimeout(() => setToast(null), 3000);
   };
 
-  const formatMoneyRaw = (num) => {
-    return num.toLocaleString('vi-VN');
-  };
-
-  const formatMoney = (num) => {
-    return num.toLocaleString('vi-VN') + ' đ';
-  };
+  const formatMoneyRaw = (num) => num.toLocaleString('vi-VN');
+  const formatMoney = (num) => num.toLocaleString('vi-VN') + ' đ';
 
   const formatDate = (isoStr) => {
     const d = new Date(isoStr);
     return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
   };
 
-  // Add a history item helper
   const addLog = (type, staff, location, productName, serial, details) => {
     const newLog = {
-      id: 'hist_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
+      id: `hist_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
       type,
       date: new Date().toISOString(),
       staff,
@@ -517,31 +562,27 @@ export default function App() {
   // 2. TRANSACTION LOGIC
   // ════════════════════════════════════════════════════
 
-  // Confirm Deposit
+  // FIX #1: No setState calls inside .map() — derive updated product, then set states separately
   const handleConfirmDeposit = (e) => {
     e.preventDefault();
     if (!currentProduct) return;
 
-    const updatedProducts = products.map(p => {
+    const depositInfo = { staff: mDepStaff, location: mDepLocation, date: new Date().toISOString() };
+    let updatedProduct;
+
+    setProducts(prev => prev.map(p => {
       if (p.id === currentProduct.id) {
-        const updated = {
-          ...p,
-          status: 'da-coc',
-          depositInfo: {
-            staff: mDepStaff,
-            location: mDepLocation,
-            date: new Date().toISOString()
-          }
-        };
-        setCurrentProduct(updated);
-        return updated;
+        updatedProduct = { ...p, status: PRODUCT_STATUS.DEPOSITED, depositInfo };
+        return updatedProduct;
       }
       return p;
-    });
+    }));
 
-    setProducts(updatedProducts);
+    const target = { ...currentProduct, status: PRODUCT_STATUS.DEPOSITED, depositInfo };
+    setCurrentProduct(target);
+
     addLog(
-      'coc',
+      LOG_TYPE.DEPOSIT,
       mDepStaff,
       mDepLocation,
       `${currentProduct.brand} ${currentProduct.name}`,
@@ -553,31 +594,21 @@ export default function App() {
     setDepositModalOpen(false);
   };
 
-  // Confirm Sale
+  // FIX #1: Same pattern for sell
   const handleConfirmSell = (e) => {
     e.preventDefault();
     if (!currentProduct) return;
 
-    const updatedProducts = products.map(p => {
-      if (p.id === currentProduct.id) {
-        const updated = {
-          ...p,
-          status: 'da-ban',
-          sellInfo: {
-            staff: mSellStaff,
-            location: mSellLocation,
-            date: new Date().toISOString()
-          }
-        };
-        setCurrentProduct(updated);
-        return updated;
-      }
-      return p;
-    });
+    const sellInfo = { staff: mSellStaff, location: mSellLocation, date: new Date().toISOString() };
 
-    setProducts(updatedProducts);
+    setProducts(prev => prev.map(p =>
+      p.id === currentProduct.id ? { ...p, status: PRODUCT_STATUS.SOLD, sellInfo } : p
+    ));
+
+    setCurrentProduct(prev => ({ ...prev, status: PRODUCT_STATUS.SOLD, sellInfo }));
+
     addLog(
-      'ban',
+      LOG_TYPE.SELL,
       mSellStaff,
       mSellLocation,
       `${currentProduct.brand} ${currentProduct.name}`,
@@ -589,35 +620,31 @@ export default function App() {
     setSellModalOpen(false);
   };
 
-  // Release / Reset Product to In Stock
+  // FIX #1: Functional update + destructure instead of delete mutation
   const handleReleaseProduct = () => {
     if (!currentProduct) return;
 
-    const updatedProducts = products.map(p => {
-      if (p.id === currentProduct.id) {
-        const updated = { ...p, status: 'con-hang' };
-        delete updated.depositInfo;
-        delete updated.sellInfo;
-        setCurrentProduct(updated);
-        return updated;
-      }
-      return p;
-    });
+    const prevStatus = currentProduct.status;
+    // eslint-disable-next-line no-unused-vars
+    const { depositInfo: _d, sellInfo: _s, ...rest } = currentProduct;
+    const released = { ...rest, status: PRODUCT_STATUS.IN_STOCK };
 
-    setProducts(updatedProducts);
+    setProducts(prev => prev.map(p => p.id === currentProduct.id ? released : p));
+    setCurrentProduct(released);
+
     addLog(
-      'he-thong',
+      LOG_TYPE.SYSTEM,
       'Hệ thống',
       currentProduct.location,
       `${currentProduct.brand} ${currentProduct.name}`,
       currentProduct.serial,
-      `Reset trạng thái từ ${currentProduct.status === 'da-coc' ? 'Đã cọc' : 'Đã bán'} về Còn hàng`
+      `Reset trạng thái từ ${prevStatus === PRODUCT_STATUS.DEPOSITED ? 'Đã cọc' : 'Đã bán'} về Còn hàng`
     );
 
     showToast(`Đã giải phóng máy ${currentProduct.name} về trạng thái Còn hàng!`);
   };
 
-  // Add new used arrival (NHẬP LIỆU)
+  // FIX #6: Save full staff name — was incorrectly trimming to last word only
   const handleAddProduct = (e) => {
     e.preventDefault();
     const newId = 'sku_' + Date.now();
@@ -627,7 +654,7 @@ export default function App() {
       name: fName,
       specs: `${fColor === '#000000' ? 'Black' : 'Color'}, ${fLens ? 'Kit' : 'Body'}, ${fBox ? 'Fullbox' : 'No box'} / ${newId}`,
       price: parseInt(fPrice, 10),
-      status: 'con-hang',
+      status: PRODUCT_STATUS.IN_STOCK,
       color: fColor,
       box: fBox,
       lens: fLens,
@@ -635,7 +662,7 @@ export default function App() {
       shotCount: fShot,
       accessories: fAccessories,
       location: fLocation,
-      staff: fStaff.split(' ').pop(),
+      staff: fStaff,
       condition: parseInt(fCondition, 10),
       description: fDesc,
       dateAdded: new Date().toISOString()
@@ -643,7 +670,7 @@ export default function App() {
 
     setProducts(prev => [...prev, newProduct]);
     addLog(
-      'nhap',
+      LOG_TYPE.IMPORT,
       fStaff,
       fLocation,
       `${fBrand} ${fName}`,
@@ -653,7 +680,6 @@ export default function App() {
 
     showToast(`Đã nhập kho thành công máy ${fBrand} ${fName}!`);
 
-    // Reset fields
     setFName('');
     setFPrice('');
     setFSerial('');
@@ -663,24 +689,16 @@ export default function App() {
     setFBox(false);
     setFLens(false);
 
-    // Redirect to brand list
     setCurrentBrand(fBrand);
     setCurrentProduct(null);
     setCurrentTab('check-gia');
   };
 
-  // Backup & Import
   const handleExportDB = () => {
-    const db = { products, history };
-    const blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `nippon_camera_db_${new Date().toISOString().slice(0, 10)}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    triggerJsonDownload(
+      { products, history },
+      `nippon_camera_db_${new Date().toISOString().slice(0, 10)}.json`
+    );
     showToast('Đã kết xuất dữ liệu bảng giá thành công!');
   };
 
@@ -699,7 +717,7 @@ export default function App() {
         } else {
           showToast('Định dạng file sao lưu không hợp lệ!', 'error');
         }
-      } catch (err) {
+      } catch {
         showToast('Lỗi khi đọc file sao lưu!', 'error');
       }
     };
@@ -709,35 +727,6 @@ export default function App() {
   // ════════════════════════════════════════════════════
   // 3. SELECTION & FILTER LOGIC
   // ════════════════════════════════════════════════════
-
-  // Get active lists
-  let filteredProducts = products;
-  if (currentBrand) {
-    filteredProducts = filteredProducts.filter(p => p.brand === currentBrand);
-  }
-
-  // Search filter
-  if (searchQuery.trim() !== '') {
-    const q = searchQuery.toLowerCase().trim();
-    filteredProducts = filteredProducts.filter(p => 
-      p.name.toLowerCase().includes(q) || p.specs.toLowerCase().includes(q)
-    );
-  }
-
-  // Price range filter
-  if (priceFilter === 'duoi-15') {
-    filteredProducts = filteredProducts.filter(p => p.price < 15000000);
-  } else if (priceFilter === '15-30') {
-    filteredProducts = filteredProducts.filter(p => p.price >= 15000000 && p.price <= 30000000);
-  } else if (priceFilter === 'tren-30') {
-    filteredProducts = filteredProducts.filter(p => p.price > 30000000);
-  }
-
-  // Pagination slice
-  const itemsPerPage = 6;
-  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
-  const startIdx = (currentPage - 1) * itemsPerPage;
-  const pagedProducts = filteredProducts.slice(startIdx, startIdx + itemsPerPage);
 
   const handleTabChange = (tab) => {
     setCurrentTab(tab);
@@ -755,6 +744,41 @@ export default function App() {
     setPriceFilter('');
     setCurrentProduct(null);
   };
+
+  // FIX #4: useMemo — filter + pagination only recomputes when relevant state changes
+  const filteredProducts = useMemo(() => {
+    let result = products;
+
+    if (currentBrand) {
+      result = result.filter(p => p.brand === currentBrand);
+    }
+    if (searchQuery.trim() !== '') {
+      const q = searchQuery.toLowerCase().trim();
+      result = result.filter(p =>
+        p.name.toLowerCase().includes(q) || p.specs.toLowerCase().includes(q)
+      );
+    }
+    if (priceFilter === 'duoi-15') {
+      result = result.filter(p => p.price < 15000000);
+    } else if (priceFilter === '15-30') {
+      result = result.filter(p => p.price >= 15000000 && p.price <= 30000000);
+    } else if (priceFilter === 'tren-30') {
+      result = result.filter(p => p.price > 30000000);
+    }
+
+    return result;
+  }, [products, currentBrand, searchQuery, priceFilter]);
+
+  const itemsPerPage = 6;
+
+  const { totalPages, pagedProducts } = useMemo(() => {
+    const total = Math.ceil(filteredProducts.length / itemsPerPage);
+    const start = (currentPage - 1) * itemsPerPage;
+    return {
+      totalPages: total,
+      pagedProducts: filteredProducts.slice(start, start + itemsPerPage),
+    };
+  }, [filteredProducts, currentPage]);
 
   // ════════════════════════════════════════════════════
   // 4. RENDERING JSX SUB-VIEWS
@@ -890,16 +914,9 @@ export default function App() {
                 </div>
               ) : (
                 <div className="productGrid">
+                  {/* FIX #2: STATUS_DISPLAY lookup replaces repeated if-else chains */}
                   {pagedProducts.map(p => {
-                    let statusText = 'Còn hàng';
-                    let statusClass = 'status-con';
-                    if (p.status === 'da-coc') {
-                      statusText = 'Đã cọc';
-                      statusClass = 'status-coc';
-                    } else if (p.status === 'da-ban') {
-                      statusText = 'Đã bán';
-                      statusClass = 'status-ban';
-                    }
+                    const { text: statusText, cls: statusClass } = STATUS_DISPLAY[p.status] ?? STATUS_DISPLAY[PRODUCT_STATUS.IN_STOCK];
 
                     return (
                       <div
@@ -1050,20 +1067,9 @@ export default function App() {
                   </div>
 
                   <div className="mainImageWrapper">
-                    <div
-                      className={`mainImageBadge ${
-                        currentProduct.status === 'con-hang'
-                          ? 'status-con'
-                          : currentProduct.status === 'da-coc'
-                          ? 'status-coc'
-                          : 'status-ban'
-                      }`}
-                    >
-                      {currentProduct.status === 'con-hang'
-                        ? 'Còn hàng'
-                        : currentProduct.status === 'da-coc'
-                        ? 'Đã cọc'
-                        : 'Đã bán'}
+                    {/* FIX #2: STATUS_DISPLAY lookup */}
+                    <div className={`mainImageBadge ${STATUS_DISPLAY[currentProduct.status]?.cls}`}>
+                      {STATUS_DISPLAY[currentProduct.status]?.text}
                     </div>
                     <div className="mainImageContainer">
                       <svg className="placeholder-img-icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
@@ -1107,7 +1113,8 @@ export default function App() {
                 </div>
 
                 <div className="actionsWrapper">
-                  {currentProduct.status === 'con-hang' ? (
+                  {/* FIX #2: PRODUCT_STATUS constants replace magic strings */}
+                  {currentProduct.status === PRODUCT_STATUS.IN_STOCK ? (
                     <>
                       <button className="actionBtn btnBan" onClick={() => setSellModalOpen(true)}>
                         BÁN NGAY
@@ -1116,7 +1123,7 @@ export default function App() {
                         NHẬN CỌC
                       </button>
                     </>
-                  ) : currentProduct.status === 'da-coc' ? (
+                  ) : currentProduct.status === PRODUCT_STATUS.DEPOSITED ? (
                     <>
                       <button className="actionBtn btnBan" onClick={() => setSellModalOpen(true)}>
                         BÁN NGAY
@@ -1316,16 +1323,17 @@ export default function App() {
               <button type="button" className="backupBtn btnExport" onClick={handleExportDB}>
                 XUẤT DỮ LIỆU JSON
               </button>
+              {/* FIX #8: useRef instead of document.getElementById */}
               <button
                 type="button"
                 className="backupBtn btnImport"
-                onClick={() => document.getElementById('import-db-file').click()}
+                onClick={() => importFileRef.current?.click()}
               >
                 NHẬP DỮ LIỆU JSON
               </button>
               <input
+                ref={importFileRef}
                 type="file"
-                id="import-db-file"
                 accept=".json"
                 style={{ display: 'none' }}
                 onChange={handleImportDB}
@@ -1348,18 +1356,8 @@ export default function App() {
               <p className="noHistory">Chưa có hoạt động giao dịch nào được ghi nhận.</p>
             ) : (
               history.map(log => {
-                let typeText = 'HỆ THỐNG';
-                let typeClass = 'type-system';
-                if (log.type === 'nhap') {
-                  typeText = 'NHẬP KHO';
-                  typeClass = 'type-nhap';
-                } else if (log.type === 'coc') {
-                  typeText = 'CỌC MÁY';
-                  typeClass = 'type-coc';
-                } else if (log.type === 'ban') {
-                  typeText = 'ĐÃ BÁN';
-                  typeClass = 'type-ban';
-                }
+                // FIX #2: LOG_DISPLAY lookup replaces repeated if-else chains
+                const { text: typeText, cls: typeClass } = LOG_DISPLAY[log.type] ?? LOG_DISPLAY[LOG_TYPE.SYSTEM];
 
                 return (
                   <div key={log.id} className="historyItem">
