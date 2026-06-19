@@ -1320,6 +1320,12 @@ export default function App() {
     return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
   };
 
+  const formatRevenue = (num) => {
+    if (num >= 1_000_000_000) return `${(num / 1_000_000_000).toFixed(1).replace('.', ',')} tỷ`;
+    if (num >= 1_000_000)     return `${(num / 1_000_000).toFixed(1).replace('.', ',')} triệu`;
+    return num.toLocaleString('vi-VN') + ' đ';
+  };
+
   const addLog = (type, staff, location, productName, serial, details) => {
     const newLog = {
       id: `hist_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
@@ -1574,6 +1580,42 @@ export default function App() {
     return result;
   }, [history, historyQuery, historyTypeFilter]);
 
+  const stats = useMemo(() => {
+    const sold      = products.filter(p => p.status === PRODUCT_STATUS.SOLD);
+    const deposited = products.filter(p => p.status === PRODUCT_STATUS.DEPOSITED);
+    const inStock   = products.filter(p => p.status === PRODUCT_STATUS.IN_STOCK);
+
+    const totalRevenue = sold.reduce((sum, p) => sum + p.price, 0);
+
+    const groupBy = (arr, keyFn, valFn = p => p.price) => {
+      const map = {};
+      arr.forEach(p => {
+        const k = keyFn(p);
+        if (!map[k]) map[k] = { rev: 0, count: 0 };
+        map[k].rev   += valFn(p);
+        map[k].count += 1;
+      });
+      return Object.entries(map)
+        .map(([key, v]) => ({ key, ...v }))
+        .sort((a, b) => b.rev - a.rev);
+    };
+
+    return {
+      totalRevenue,
+      soldCount:      sold.length,
+      depositedCount: deposited.length,
+      inStockCount:   inStock.length,
+      totalCount:     products.length,
+      byLocation: groupBy(sold, p => p.sellInfo?.location || p.location),
+      byStaff:    groupBy(sold, p => p.sellInfo?.staff    || p.staff),
+      byBrand:    groupBy(sold, p => p.brand),
+      topProducts: [...sold].sort((a, b) => b.price - a.price).slice(0, 5),
+      logCounts:  Object.fromEntries(
+        Object.values(LOG_TYPE).map(t => [t, history.filter(l => l.type === t).length])
+      ),
+    };
+  }, [products, history]);
+
   const handleTabChange = (tab) => {
     setCurrentTab(tab);
     if (tab !== 'check-gia') {
@@ -1667,6 +1709,13 @@ export default function App() {
           onClick={() => handleTabChange('lich-su')}
         >
           LỊCH SỬ
+        </button>
+        <button
+          className={`bottomNavBtn ${currentTab === 'thong-ke' ? 'active' : ''}`}
+          data-tab="thong-ke"
+          onClick={() => handleTabChange('thong-ke')}
+        >
+          THỐNG KÊ
         </button>
       </div>
 
@@ -2474,6 +2523,159 @@ export default function App() {
                 );
               })
             )}
+          </div>
+        </div>
+      )}
+
+      {/* ── SUBVIEW: THỐNG KÊ DOANH SỐ ── */}
+      {currentTab === 'thong-ke' && (
+        <div id="thong-ke-view">
+          <div className="viewHeader">
+            <h2>THỐNG KÊ DOANH SỐ</h2>
+            <p className="viewSubtitle">Tổng quan hoạt động kinh doanh tại tất cả chi nhánh.</p>
+          </div>
+
+          {/* KPI Cards */}
+          <div className="kpiGrid">
+            <div className="kpiCard kpiRevenue">
+              <div className="kpiLabel">Doanh thu đã bán</div>
+              <div className="kpiValue">{formatRevenue(stats.totalRevenue)}</div>
+              <div className="kpiSub">{stats.soldCount} sản phẩm</div>
+            </div>
+            <div className="kpiCard kpiSold">
+              <div className="kpiLabel">Đã bán</div>
+              <div className="kpiValue">{stats.soldCount}</div>
+              <div className="kpiSub">sản phẩm</div>
+            </div>
+            <div className="kpiCard kpiDeposit">
+              <div className="kpiLabel">Đang giữ cọc</div>
+              <div className="kpiValue">{stats.depositedCount}</div>
+              <div className="kpiSub">sản phẩm</div>
+            </div>
+            <div className="kpiCard kpiStock">
+              <div className="kpiLabel">Tồn kho</div>
+              <div className="kpiValue">{stats.inStockCount}</div>
+              <div className="kpiSub">/ {stats.totalCount} tổng</div>
+            </div>
+          </div>
+
+          {/* Charts row */}
+          <div className="statsRow">
+            {/* By location */}
+            <div className="statsCard">
+              <h3 className="statsCardTitle">Doanh thu theo chi nhánh</h3>
+              {stats.byLocation.length === 0 ? (
+                <p className="statsEmpty">Chưa có dữ liệu bán hàng.</p>
+              ) : stats.byLocation.map(({ key, rev, count }) => (
+                <div key={key} className="statBarRow">
+                  <div className="statBarLabel">{key}</div>
+                  <div className="statBarTrack">
+                    <div
+                      className="statBarFill statBarBlue"
+                      style={{ width: `${Math.round(rev / stats.byLocation[0].rev * 100)}%` }}
+                    />
+                  </div>
+                  <div className="statBarMeta">
+                    <span className="statBarValue">{formatRevenue(rev)}</span>
+                    <span className="statBarCount">{count} máy</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* By staff */}
+            <div className="statsCard">
+              <h3 className="statsCardTitle">Doanh thu theo nhân viên</h3>
+              {stats.byStaff.length === 0 ? (
+                <p className="statsEmpty">Chưa có dữ liệu bán hàng.</p>
+              ) : stats.byStaff.map(({ key, rev, count }) => (
+                <div key={key} className="statBarRow">
+                  <div className="statBarLabel">{key}</div>
+                  <div className="statBarTrack">
+                    <div
+                      className="statBarFill statBarGreen"
+                      style={{ width: `${Math.round(rev / stats.byStaff[0].rev * 100)}%` }}
+                    />
+                  </div>
+                  <div className="statBarMeta">
+                    <span className="statBarValue">{formatRevenue(rev)}</span>
+                    <span className="statBarCount">{count} máy</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* By brand */}
+          <div className="statsCard statsCardFull">
+            <h3 className="statsCardTitle">Doanh thu theo thương hiệu</h3>
+            {stats.byBrand.length === 0 ? (
+              <p className="statsEmpty">Chưa có dữ liệu bán hàng.</p>
+            ) : (
+              <div className="brandStatsGrid">
+                {stats.byBrand.map(({ key, rev, count }) => (
+                  <div key={key} className="statBarRow">
+                    <div className="statBarLabel">{key}</div>
+                    <div className="statBarTrack">
+                      <div
+                        className="statBarFill statBarRed"
+                        style={{ width: `${Math.round(rev / stats.byBrand[0].rev * 100)}%` }}
+                      />
+                    </div>
+                    <div className="statBarMeta">
+                      <span className="statBarValue">{formatRevenue(rev)}</span>
+                      <span className="statBarCount">{count} máy</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Top 5 products */}
+          <div className="statsCard statsCardFull">
+            <h3 className="statsCardTitle">Top sản phẩm bán được giá cao nhất</h3>
+            {stats.topProducts.length === 0 ? (
+              <p className="statsEmpty">Chưa có sản phẩm nào được bán.</p>
+            ) : stats.topProducts.map((p, i) => (
+              <div key={p.id} className="topProductRow">
+                <span className={`topProductRank rank-${i + 1}`}>#{i + 1}</span>
+                <div className="topProductInfo">
+                  <span className="topProductName">{p.brand} {p.name}</span>
+                  <span className="topProductMeta">
+                    {p.sellInfo?.staff || p.staff}
+                    <span className="dot-separator">•</span>
+                    {p.sellInfo?.location || p.location}
+                    {p.sellInfo?.date && (
+                      <>
+                        <span className="dot-separator">•</span>
+                        {formatDate(p.sellInfo.date).split(' ')[0]}
+                      </>
+                    )}
+                  </span>
+                </div>
+                <span className="topProductPrice">{formatMoneyRaw(p.price)} đ</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Transaction counts */}
+          <div className="statsCard statsCardFull">
+            <h3 className="statsCardTitle">Tổng số giao dịch theo loại</h3>
+            <div className="logCountGrid">
+              {[
+                { type: LOG_TYPE.IMPORT,  label: 'Nhập kho', cls: 'type-nhap'  },
+                { type: LOG_TYPE.DEPOSIT, label: 'Cọc máy',  cls: 'type-coc'   },
+                { type: LOG_TYPE.SELL,    label: 'Đã bán',   cls: 'type-ban'   },
+                { type: LOG_TYPE.SYSTEM,  label: 'Hệ thống', cls: 'type-system' },
+              ].map(({ type, label, cls }) => (
+                <div key={type} className="logCountCard">
+                  <span className={`historyType ${cls}`}>{label}</span>
+                  <span className="logCountNum">{stats.logCounts[type] ?? 0}</span>
+                  <span className="logCountSub">giao dịch</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       )}

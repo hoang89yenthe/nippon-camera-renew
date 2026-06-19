@@ -91,7 +91,7 @@ body {
   left: 50%;
   transform: translateX(-50%);
   width: calc(100% - 48px);
-  max-width: 600px;
+  max-width: 720px;
   height: 64px;
   background: rgba(35, 31, 32, 0.85); /* Semi-transparent brand dark */
   backdrop-filter: blur(12px);
@@ -111,10 +111,10 @@ body {
   border: none;
   color: rgba(255, 255, 255, 0.6);
   font-family: var(--font-primary);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
-  letter-spacing: 0.5px;
-  padding: 8px 24px;
+  letter-spacing: 0.4px;
+  padding: 8px 16px;
   border-radius: 20px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1506,14 +1506,302 @@ body {
   }
 
   .bottomNavBtn {
-    padding: 6px 16px;
-    font-size: 12px;
+    padding: 6px 10px;
+    font-size: 11px;
+    letter-spacing: 0;
   }
 }
 
 @media (max-width: 480px) {
   .brandGrid {
     grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ── 12. THỐNG KÊ DOANH SỐ ── */
+
+#thong-ke-view {
+  padding: 24px 20px 120px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* KPI grid */
+.kpiGrid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.kpiCard {
+  background: var(--card-bg-light);
+  border-radius: 16px;
+  padding: 18px 20px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.kpiLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary-light);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.kpiValue {
+  font-family: var(--font-heading);
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text-primary-light);
+  line-height: 1.1;
+}
+
+.kpiSub {
+  font-size: 12px;
+  color: var(--text-secondary-light);
+}
+
+.kpiRevenue .kpiValue { color: var(--brand-red); }
+.kpiSold    .kpiValue { color: #e74c3c; }
+.kpiDeposit .kpiValue { color: #f39c12; }
+.kpiStock   .kpiValue { color: #2ecc71; }
+
+/* Charts layout */
+.statsRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.statsCard {
+  background: var(--card-bg-light);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-light);
+}
+
+.statsCardFull {
+  margin-bottom: 16px;
+}
+
+.statsCardTitle {
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary-light);
+  margin: 0 0 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.statsEmpty {
+  font-size: 13px;
+  color: var(--text-secondary-light);
+  margin: 0;
+}
+
+/* Bar rows */
+.statBarRow {
+  display: grid;
+  grid-template-columns: 140px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.statBarRow:last-child {
+  margin-bottom: 0;
+}
+
+.statBarLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary-light);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.statBarTrack {
+  height: 8px;
+  background: var(--bg-light);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.statBarFill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 4px;
+}
+
+.statBarBlue  { background: #0088ff; }
+.statBarGreen { background: #2ecc71; }
+.statBarRed   { background: var(--brand-red); }
+
+.statBarMeta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  min-width: 80px;
+}
+
+.statBarValue {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary-light);
+}
+
+.statBarCount {
+  font-size: 11px;
+  color: var(--text-secondary-light);
+}
+
+/* Brand stats 2-col grid inside the full card */
+.brandStatsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 24px;
+}
+
+/* Top products */
+.topProductRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.topProductRow:last-child {
+  border-bottom: none;
+}
+
+.topProductRank {
+  font-family: var(--font-heading);
+  font-size: 16px;
+  font-weight: 800;
+  width: 32px;
+  text-align: center;
+  flex-shrink: 0;
+  color: var(--text-secondary-light);
+}
+
+.rank-1 { color: #f1c40f; }
+.rank-2 { color: #95a5a6; }
+.rank-3 { color: #cd7f32; }
+
+.topProductInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.topProductName {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary-light);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.topProductMeta {
+  font-size: 12px;
+  color: var(--text-secondary-light);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.topProductPrice {
+  font-family: var(--font-heading);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--brand-red);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Transaction count chips */
+.logCountGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.logCountCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px;
+  background: var(--bg-light);
+  border-radius: 12px;
+}
+
+.logCountNum {
+  font-family: var(--font-heading);
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text-primary-light);
+  line-height: 1;
+}
+
+.logCountSub {
+  font-size: 11px;
+  color: var(--text-secondary-light);
+}
+
+/* Responsive stats */
+@media (max-width: 768px) {
+  .kpiGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .kpiRevenue {
+    grid-column: 1 / -1;
+  }
+
+  .kpiValue {
+    font-size: 22px;
+  }
+
+  .statsRow {
+    grid-template-columns: 1fr;
+  }
+
+  .statBarRow {
+    grid-template-columns: 110px 1fr auto;
+  }
+
+  .brandStatsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .logCountGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .statBarRow {
+    grid-template-columns: 90px 1fr auto;
+  }
+
+  .statBarLabel {
+    font-size: 12px;
   }
 }
 
