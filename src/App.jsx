@@ -370,29 +370,794 @@ const INITIAL_PRODUCTS = [
     condition: 98,
     description: 'Tripod Carbon siêu bền nhẹ, chịu lực tốt, xếp siêu gọn cho nhiếp ảnh gia.',
     dateAdded: new Date().toISOString()
+  },
+
+  // ── SONY ──
+  {
+    id: '49490',
+    brand: 'SONY',
+    name: 'A7C II',
+    specs: 'Silver, Body, Fullbox / 49490',
+    price: 46500000,
+    status: PRODUCT_STATUS.IN_STOCK,
+    color: '#c0c0c0',
+    box: true,
+    lens: false,
+    serial: '70192',
+    shotCount: '3.200',
+    accessories: 'Fullbox đầy đủ phụ kiện Sony',
+    location: '193 Giảng Võ',
+    staff: 'Lê Hồng Quân',
+    condition: 97,
+    description: 'Màu Silver sang trọng, AI AF xịn, body nhỏ gọn, hoạt động hoàn hảo.',
+    dateAdded: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString()
+  },
+  {
+    id: '50490',
+    brand: 'SONY',
+    name: 'ZV-E10 II',
+    specs: 'Black, Body, Fullbox / 50490',
+    price: 14900000,
+    status: PRODUCT_STATUS.DEPOSITED,
+    color: '#000000',
+    box: true,
+    lens: false,
+    serial: '71029',
+    shotCount: '500',
+    accessories: 'Fullbox, thẻ nhớ 64GB, dây đeo',
+    location: '74 Bà Triệu',
+    staff: 'Trần Văn Nam',
+    condition: 99,
+    description: 'Máy quay vlog APS-C mới nhất, như mới đập hộp, AF bắt mắt cực nhanh.',
+    dateAdded: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
+    depositInfo: {
+      staff: 'Trần Văn Nam',
+      location: '74 Bà Triệu',
+      date: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString()
+    }
+  },
+  {
+    id: '51490',
+    brand: 'SONY',
+    name: 'FX30',
+    specs: 'Black, Body, Fullbox / 51490',
+    price: 36900000,
+    status: PRODUCT_STATUS.SOLD,
+    color: '#000000',
+    box: true,
+    lens: false,
+    serial: '72910',
+    shotCount: '1.200',
+    accessories: 'Fullbox, tay cầm XLR-H1, 2 pin',
+    location: '193 Giảng Võ',
+    staff: 'Lê Hồng Quân',
+    condition: 98,
+    description: 'Cinema Line APS-C quay phim cực chất, ổn định màu sắc, AF theo mắt.',
+    dateAdded: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+    sellInfo: {
+      staff: 'Lê Hồng Quân',
+      location: '193 Giảng Võ',
+      date: new Date(Date.now() - 18 * 24 * 60 * 60 * 1000).toISOString()
+    }
+  },
+
+  // ── CANON ──
+  {
+    id: '52490',
+    brand: 'CANON',
+    name: 'EOS R50',
+    specs: 'White, Kit 18-45mm, Fullbox / 52490',
+    price: 15500000,
+    status: PRODUCT_STATUS.IN_STOCK,
+    color: '#f5f5f5',
+    box: true,
+    lens: true,
+    serial: '80291',
+    shotCount: '2.100',
+    accessories: 'Fullbox, thẻ nhớ 32GB, túi máy',
+    location: '193 NBK',
+    staff: 'Nguyễn Việt Thịnh',
+    condition: 98,
+    description: 'Màu White nổi bật, kit lens 18-45mm sắc nét, phù hợp người mới bắt đầu.',
+    dateAdded: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString()
+  },
+  {
+    id: '53490',
+    brand: 'CANON',
+    name: 'EOS R5 Mark II',
+    specs: 'Black, Body, Fullbox / 53490',
+    price: 88000000,
+    status: PRODUCT_STATUS.SOLD,
+    color: '#000000',
+    box: true,
+    lens: false,
+    serial: '81029',
+    shotCount: '4.800',
+    accessories: 'Fullbox đầy đủ, thêm grip BG-R10',
+    location: '74 Bà Triệu',
+    staff: 'Trần Văn Nam',
+    condition: 99,
+    description: 'Flagship hybrid quay phim 8K RAW, AF nhân tạo cực mạnh, máy sạch bóng.',
+    dateAdded: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000).toISOString(),
+    sellInfo: {
+      staff: 'Trần Văn Nam',
+      location: '74 Bà Triệu',
+      date: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString()
+    }
+  },
+
+  // ── DJI ──
+  {
+    id: '54490',
+    brand: 'DJI',
+    name: 'Mini 4 Pro Fly More Combo Plus',
+    specs: 'Grey, Fly More Combo Plus, Fullbox / 54490',
+    price: 21500000,
+    status: PRODUCT_STATUS.IN_STOCK,
+    color: '#3a3a3a',
+    box: true,
+    lens: true,
+    serial: '89201',
+    shotCount: '0',
+    accessories: 'Đầy đủ Fly More Combo Plus: sạc hub, 3 pin, túi đeo',
+    location: '42 Huỳnh Thúc Kháng',
+    staff: 'Đỗ Minh Trí',
+    condition: 99,
+    description: 'Drone 4K HDR siêu gọn, tránh chướng ngại vật 4 chiều, bay 34 phút, fullbox như mới.',
+    dateAdded: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString()
+  },
+  {
+    id: '55490',
+    brand: 'DJI',
+    name: 'RS 4 Pro',
+    specs: 'Black, Combo, Fullbox / 55490',
+    price: 11900000,
+    status: PRODUCT_STATUS.DEPOSITED,
+    color: '#000000',
+    box: true,
+    lens: false,
+    serial: '90102',
+    shotCount: '0',
+    accessories: 'Gimbal, focus motor, sạc đa năng, túi vải',
+    location: '193 Giảng Võ',
+    staff: 'Lê Hồng Quân',
+    condition: 98,
+    description: 'Gimbal chuyên nghiệp tải trọng 4.5kg, bộ nhớ 20GB tích hợp, ổn định tuyệt vời.',
+    dateAdded: new Date(Date.now() - 9 * 24 * 60 * 60 * 1000).toISOString(),
+    depositInfo: {
+      staff: 'Nguyễn Việt Thịnh',
+      location: '193 NBK',
+      date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString()
+    }
+  },
+
+  // ── NIKON ──
+  {
+    id: '56490',
+    brand: 'NIKON',
+    name: 'Z30',
+    specs: 'Black, Kit 16-50mm, Fullbox / 56490',
+    price: 13500000,
+    status: PRODUCT_STATUS.IN_STOCK,
+    color: '#000000',
+    box: true,
+    lens: true,
+    serial: '10029',
+    shotCount: '3.500',
+    accessories: 'Fullbox, pin EN-EL25, sạc zin',
+    location: '74 Bà Triệu',
+    staff: 'Trần Văn Nam',
+    condition: 96,
+    description: 'Máy vlog không viewfinder, flip màn hình cực tiện, AF bám mắt mượt mà.',
+    dateAdded: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toISOString()
+  },
+  {
+    id: '57490',
+    brand: 'NIKON',
+    name: 'Z6 III',
+    specs: 'Black, Body, Fullbox / 57490',
+    price: 58000000,
+    status: PRODUCT_STATUS.DEPOSITED,
+    color: '#000000',
+    box: true,
+    lens: false,
+    serial: '11209',
+    shotCount: '2.900',
+    accessories: 'Fullbox đầy đủ, thêm grip MB-N14',
+    location: '193 Giảng Võ',
+    staff: 'Lê Hồng Quân',
+    condition: 99,
+    description: 'Cảm biến BSI CMOS 24.5MP, quay 6K RAW nội 12-bit, EVF 5.76 triệu điểm đỉnh nhất phân khúc.',
+    dateAdded: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+    depositInfo: {
+      staff: 'Lê Hồng Quân',
+      location: '193 Giảng Võ',
+      date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString()
+    }
+  },
+
+  // ── RICOH ──
+  {
+    id: '58490',
+    brand: 'RICOH',
+    name: 'GR IIIx',
+    specs: 'Black, Body, No box / 58490',
+    price: 27900000,
+    status: PRODUCT_STATUS.DEPOSITED,
+    color: '#000000',
+    box: false,
+    lens: true,
+    serial: '20019',
+    shotCount: '6.200',
+    accessories: 'Sạc, 2 Pin DB-110, dây đeo tay da cao cấp',
+    location: '193 NBK',
+    staff: 'Nguyễn Việt Thịnh',
+    condition: 95,
+    description: 'Ống kính 40mm f/2.8 góc trung tính, ngoại hình xước dăm đế máy nhưng thấu kính sạch hoàn toàn.',
+    dateAdded: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+    depositInfo: {
+      staff: 'Nguyễn Việt Thịnh',
+      location: '193 NBK',
+      date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
+    }
+  },
+
+  // ── SIGMA ──
+  {
+    id: '59490',
+    brand: 'SIGMA',
+    name: '18-50mm f/2.8 DC DN Contemporary (Fuji X)',
+    specs: 'Black, Lens, Fullbox / 59490',
+    price: 9800000,
+    status: PRODUCT_STATUS.IN_STOCK,
+    color: '#000000',
+    box: true,
+    lens: true,
+    serial: '91028',
+    shotCount: '0',
+    accessories: 'Fullbox, nắp trước sau zin, hood, túi đựng',
+    location: '193 Giảng Võ',
+    staff: 'Lê Hồng Quân',
+    condition: 99,
+    description: 'Lens zoom khẩu lớn APS-C nhỏ gọn bậc nhất cho Fuji X, kính trong vắt không tì vết.',
+    dateAdded: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString()
+  },
+
+  // ── TAMRON ──
+  {
+    id: '60490',
+    brand: 'TAMRON',
+    name: '17-28mm f/2.8 Di III RXD (Sony E)',
+    specs: 'Black, Lens, Fullbox / 60490',
+    price: 14200000,
+    status: PRODUCT_STATUS.SOLD,
+    color: '#000000',
+    box: true,
+    lens: true,
+    serial: '80291',
+    shotCount: '0',
+    accessories: 'Fullbox phụ kiện zin, kính lọc UV 67mm',
+    location: '193 NBK',
+    staff: 'Nguyễn Việt Thịnh',
+    condition: 97,
+    description: 'Wide-angle zoom khẩu f/2.8, siêu nhẹ chỉ 420g, kính đẹp không mốc.',
+    dateAdded: new Date(Date.now() - 22 * 24 * 60 * 60 * 1000).toISOString(),
+    sellInfo: {
+      staff: 'Nguyễn Việt Thịnh',
+      location: '193 NBK',
+      date: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString()
+    }
+  },
+
+  // ── VILTROX ──
+  {
+    id: '61490',
+    brand: 'VILTROX',
+    name: '56mm f/1.4 AF STM (Fuji X)',
+    specs: 'Black, Lens, Fullbox / 61490',
+    price: 5200000,
+    status: PRODUCT_STATUS.SOLD,
+    color: '#000000',
+    box: true,
+    lens: true,
+    serial: '62019',
+    shotCount: '0',
+    accessories: 'Fullbox, hood, túi đựng lens, nắp UV',
+    location: '42 Huỳnh Thúc Kháng',
+    staff: 'Đỗ Minh Trí',
+    condition: 98,
+    description: 'Chân dung 56mm f/1.4 cho Fuji X, bokeh mịn đẹp, AF nhanh im lặng, như mới.',
+    dateAdded: new Date(Date.now() - 18 * 24 * 60 * 60 * 1000).toISOString(),
+    sellInfo: {
+      staff: 'Đỗ Minh Trí',
+      location: '42 Huỳnh Thúc Kháng',
+      date: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString()
+    }
+  },
+
+  // ── LEICA ──
+  {
+    id: '62490',
+    brand: 'LEICA',
+    name: 'M11 Monochrom',
+    specs: 'Black Paint, Rangefinder, Fullbox / 62490',
+    price: 210000000,
+    status: PRODUCT_STATUS.SOLD,
+    color: '#1a1a1a',
+    box: true,
+    lens: false,
+    serial: '19920',
+    shotCount: '1.500',
+    accessories: 'Fullbox đầy đủ phụ kiện Leica, dây đeo da Leica gốc',
+    location: '193 Giảng Võ',
+    staff: 'Lê Hồng Quân',
+    condition: 99,
+    description: 'Cảm biến 60MP Monochrom thuần đen trắng độc nhất vô nhị, độ phân giải dải động đỉnh cao.',
+    dateAdded: new Date(Date.now() - 35 * 24 * 60 * 60 * 1000).toISOString(),
+    sellInfo: {
+      staff: 'Lê Hồng Quân',
+      location: '193 Giảng Võ',
+      date: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString()
+    }
+  },
+
+  // ── HASSELBLAD ──
+  {
+    id: '63490',
+    brand: 'HASSELBLAD',
+    name: '907X 50C',
+    specs: 'Silver, Medium Format, Fullbox / 63490',
+    price: 145000000,
+    status: PRODUCT_STATUS.IN_STOCK,
+    color: '#c0c0c0',
+    box: true,
+    lens: false,
+    serial: '30192',
+    shotCount: '400',
+    accessories: 'Fullbox, ngàm XCD adapter, sạc zin',
+    location: '193 Giảng Võ',
+    staff: 'Lê Hồng Quân',
+    condition: 99,
+    description: 'Thiết kế tối giản iconic, cảm biến 50MP Medium Format, hàng hiếm thị trường Việt Nam.',
+    dateAdded: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
+  },
+
+  // ── FUJI bổ sung ──
+  {
+    id: '64490',
+    brand: 'FUJI',
+    name: 'X-E4',
+    specs: 'Silver, Body, No box / 64490',
+    price: 18900000,
+    status: PRODUCT_STATUS.SOLD,
+    color: '#c0c0c0',
+    box: false,
+    lens: false,
+    serial: '29182',
+    shotCount: '9.000',
+    accessories: 'Sạc, 1 Pin zin, ốp da nâu aftermarket',
+    location: '193 Giảng Võ',
+    staff: 'Lê Hồng Quân',
+    condition: 93,
+    description: 'Thiết kế mỏng dẹp hoài cổ, film simulation đỉnh cao, xước dăm nhẹ nắp sau.',
+    dateAdded: new Date(Date.now() - 28 * 24 * 60 * 60 * 1000).toISOString(),
+    sellInfo: {
+      staff: 'Lê Hồng Quân',
+      location: '193 Giảng Võ',
+      date: new Date(Date.now() - 21 * 24 * 60 * 60 * 1000).toISOString()
+    }
+  },
+  {
+    id: '65490',
+    brand: 'FUJI',
+    name: 'GFX 50S II',
+    specs: 'Black, Medium Format Body, Fullbox / 65490',
+    price: 72000000,
+    status: PRODUCT_STATUS.DEPOSITED,
+    color: '#000000',
+    box: true,
+    lens: false,
+    serial: '30029',
+    shotCount: '2.200',
+    accessories: 'Fullbox, sạc đôi, 2 pin NP-T125 zin',
+    location: '193 NBK',
+    staff: 'Nguyễn Việt Thịnh',
+    condition: 97,
+    description: 'Medium Format 51.4MP IBIS, màu sắc Fuji chân thực tuyệt vời, xước dăm rất nhẹ đáy máy.',
+    dateAdded: new Date(Date.now() - 9 * 24 * 60 * 60 * 1000).toISOString(),
+    depositInfo: {
+      staff: 'Nguyễn Việt Thịnh',
+      location: '193 NBK',
+      date: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString()
+    }
+  },
+
+  // ── PHỤ KIỆN bổ sung ──
+  {
+    id: '66490',
+    brand: 'PHỤ KIỆN',
+    name: 'Flash Godox V1 Pro (Sony)',
+    specs: 'Black, Flash, Fullbox / 66490',
+    price: 4200000,
+    status: PRODUCT_STATUS.IN_STOCK,
+    color: '#000000',
+    box: true,
+    lens: false,
+    serial: 'GX-V1P-9201',
+    shotCount: '0',
+    accessories: 'Fullbox, pin Li-ion VB26A, sạc nhanh USB-C',
+    location: '193 NBK',
+    staff: 'Nguyễn Việt Thịnh',
+    condition: 99,
+    description: 'Flash đầu xoay tròn 76Ws, HSS 1/8000s, TTL Sony, sạc nhanh đầy pin 1.5 tiếng, như mới.',
+    dateAdded: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString()
+  },
+  {
+    id: '67490',
+    brand: 'PHỤ KIỆN',
+    name: 'Túi máy Lowepro Flipside 400 AW III',
+    specs: 'Black, Backpack, Fullbox / 67490',
+    price: 3100000,
+    status: PRODUCT_STATUS.SOLD,
+    color: '#000000',
+    box: true,
+    lens: false,
+    serial: 'LP-FA400-8291',
+    shotCount: '0',
+    accessories: 'Túi mưa AW, khoá TSA, móc túi phụ',
+    location: '74 Bà Triệu',
+    staff: 'Trần Văn Nam',
+    condition: 96,
+    description: 'Ba lô đựng máy ảnh + laptop 15", vải chống nước, ngăn chứa rộng rãi, xước dăm nhẹ khoá kéo.',
+    dateAdded: new Date(Date.now() - 26 * 24 * 60 * 60 * 1000).toISOString(),
+    sellInfo: {
+      staff: 'Trần Văn Nam',
+      location: '74 Bà Triệu',
+      date: new Date(Date.now() - 16 * 24 * 60 * 60 * 1000).toISOString()
+    }
+  },
+  {
+    id: '68490',
+    brand: 'PHỤ KIỆN',
+    name: 'Kính lọc Kase Wolverine CPL 82mm',
+    specs: 'Silver, Filter, Fullbox / 68490',
+    price: 1850000,
+    status: PRODUCT_STATUS.IN_STOCK,
+    color: '#c0c0c0',
+    box: true,
+    lens: false,
+    serial: 'KS-CPL82-1029',
+    shotCount: '0',
+    accessories: 'Hộp nhôm đựng filter, khăn lau kính',
+    location: '42 Huỳnh Thúc Kháng',
+    staff: 'Đỗ Minh Trí',
+    condition: 99,
+    description: 'Kính CPL cao cấp Schott MRC Nano 28 lớp phủ, khử phản xạ đỉnh cao, kính không trầy.',
+    dateAdded: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString()
   }
 ];
 
 const INITIAL_HISTORY = [
+  // ── Hôm nay / gần đây nhất ──
   {
-    id: 'hist_1',
+    id: 'hist_01',
+    type: LOG_TYPE.IMPORT,
+    date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    staff: 'Đỗ Minh Trí',
+    location: '42 Huỳnh Thúc Kháng',
+    productName: 'Kase Wolverine CPL 82mm',
+    serial: 'KS-CPL82-1029',
+    details: 'Nhập kho kính lọc Kase Wolverine CPL 82mm ngoại hình 99% bởi Đỗ Minh Trí.'
+  },
+  {
+    id: 'hist_02',
+    type: LOG_TYPE.DEPOSIT,
+    date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+    staff: 'Nguyễn Việt Thịnh',
+    location: '193 NBK',
+    productName: 'RICOH GR IIIx',
+    serial: '20019',
+    details: 'Xác nhận khách nhận cọc máy RICOH GR IIIx (Serial: 20019) cho khách của Nguyễn Việt Thịnh tại chi nhánh 193 NBK.'
+  },
+  {
+    id: 'hist_03',
+    type: LOG_TYPE.IMPORT,
+    date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+    staff: 'Lê Hồng Quân',
+    location: '193 Giảng Võ',
+    productName: 'HASSELBLAD 907X 50C',
+    serial: '30192',
+    details: 'Nhập kho máy cũ HASSELBLAD 907X 50C ngoại hình 99% bởi Lê Hồng Quân.'
+  },
+  {
+    id: 'hist_04',
+    type: LOG_TYPE.DEPOSIT,
+    date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+    staff: 'Lê Hồng Quân',
+    location: '193 Giảng Võ',
+    productName: 'NIKON Z6 III',
+    serial: '11209',
+    details: 'Xác nhận khách nhận cọc máy NIKON Z6 III (Serial: 11209) cho khách của Lê Hồng Quân tại chi nhánh 193 Giảng Võ.'
+  },
+  {
+    id: 'hist_05',
+    type: LOG_TYPE.IMPORT,
+    date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+    staff: 'Lê Hồng Quân',
+    location: '193 Giảng Võ',
+    productName: 'DJI Mini 4 Pro Fly More Combo Plus',
+    serial: '89201',
+    details: 'Nhập kho máy DJI Mini 4 Pro Fly More Combo Plus ngoại hình 99% bởi Lê Hồng Quân.'
+  },
+  {
+    id: 'hist_06',
+    type: LOG_TYPE.IMPORT,
+    date: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
+    staff: 'Nguyễn Việt Thịnh',
+    location: '193 NBK',
+    productName: 'DJI Osmo Pocket 3 Creator Combo',
+    serial: '88102',
+    details: 'Nhập kho máy DJI Osmo Pocket 3 Creator Combo ngoại hình 99%.'
+  },
+  {
+    id: 'hist_07',
+    type: LOG_TYPE.IMPORT,
+    date: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
+    staff: 'Trần Văn Nam',
+    location: '74 Bà Triệu',
+    productName: 'SONY ZV-E10 II',
+    serial: '71029',
+    details: 'Nhập kho máy cũ SONY ZV-E10 II ngoại hình 99% bởi Trần Văn Nam.'
+  },
+  {
+    id: 'hist_08',
+    type: LOG_TYPE.DEPOSIT,
+    date: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
+    staff: 'Trần Văn Nam',
+    location: '74 Bà Triệu',
+    productName: 'SONY ZV-E10 II',
+    serial: '71029',
+    details: 'Xác nhận khách nhận cọc máy SONY ZV-E10 II (Serial: 71029) cho khách của Trần Văn Nam tại chi nhánh 74 Bà Triệu.'
+  },
+  {
+    id: 'hist_09',
     type: LOG_TYPE.IMPORT,
     date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
     staff: 'Nguyễn Việt Thịnh',
     location: '193 NBK',
-    productName: 'Fuji X-M5',
+    productName: 'FUJI X-M5',
     serial: '37428',
     details: 'Nhập kho máy cũ Fuji X-M5 ngoại hình 97%.'
   },
   {
-    id: 'hist_2',
+    id: 'hist_10',
+    type: LOG_TYPE.DEPOSIT,
+    date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+    staff: 'Nguyễn Việt Thịnh',
+    location: '193 NBK',
+    productName: 'DJI RS 4 Pro',
+    serial: '90102',
+    details: 'Xác nhận khách nhận cọc máy DJI RS 4 Pro (Serial: 90102) cho khách của Nguyễn Việt Thịnh tại chi nhánh 193 NBK.'
+  },
+  {
+    id: 'hist_11',
+    type: LOG_TYPE.DEPOSIT,
+    date: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
+    staff: 'Nguyễn Việt Thịnh',
+    location: '193 NBK',
+    productName: 'FUJI GFX 50S II',
+    serial: '30029',
+    details: 'Xác nhận khách nhận cọc máy FUJI GFX 50S II (Serial: 30029) cho khách của Nguyễn Việt Thịnh tại chi nhánh 193 NBK.'
+  },
+  {
+    id: 'hist_12',
     type: LOG_TYPE.IMPORT,
-    date: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
+    date: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
+    staff: 'Nguyễn Việt Thịnh',
+    location: '193 NBK',
+    productName: 'Flash Godox V1 Pro (Sony)',
+    serial: 'GX-V1P-9201',
+    details: 'Nhập kho Flash Godox V1 Pro (Sony) ngoại hình 99% bởi Nguyễn Việt Thịnh.'
+  },
+  {
+    id: 'hist_13',
+    type: LOG_TYPE.IMPORT,
+    date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
     staff: 'Lê Hồng Quân',
     location: '193 Giảng Võ',
-    productName: 'DJI Osmo Pocket 3 Creator Combo',
-    serial: '88102',
-    details: 'Nhập kho máy DJI Osmo Pocket 3 Creator Combo ngoại hình 99%.'
+    productName: 'NIKON Z6 III',
+    serial: '11209',
+    details: 'Nhập kho máy cũ NIKON Z6 III ngoại hình 99% bởi Lê Hồng Quân.'
+  },
+  {
+    id: 'hist_14',
+    type: LOG_TYPE.IMPORT,
+    date: new Date(Date.now() - 9 * 24 * 60 * 60 * 1000).toISOString(),
+    staff: 'Lê Hồng Quân',
+    location: '193 Giảng Võ',
+    productName: 'FUJI GFX 50S II',
+    serial: '30029',
+    details: 'Nhập kho máy cũ FUJI GFX 50S II ngoại hình 97% bởi Lê Hồng Quân.'
+  },
+  {
+    id: 'hist_15',
+    type: LOG_TYPE.IMPORT,
+    date: new Date(Date.now() - 9 * 24 * 60 * 60 * 1000).toISOString(),
+    staff: 'Lê Hồng Quân',
+    location: '193 Giảng Võ',
+    productName: 'DJI RS 4 Pro',
+    serial: '90102',
+    details: 'Nhập kho gimbal DJI RS 4 Pro ngoại hình 98% bởi Lê Hồng Quân.'
+  },
+  {
+    id: 'hist_16',
+    type: LOG_TYPE.IMPORT,
+    date: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+    staff: 'Nguyễn Việt Thịnh',
+    location: '193 NBK',
+    productName: 'RICOH GR IIIx',
+    serial: '20019',
+    details: 'Nhập kho máy cũ RICOH GR IIIx ngoại hình 95% bởi Nguyễn Việt Thịnh.'
+  },
+  {
+    id: 'hist_17',
+    type: LOG_TYPE.SELL,
+    date: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(),
+    staff: 'Đỗ Minh Trí',
+    location: '42 Huỳnh Thúc Kháng',
+    productName: 'VILTROX 56mm f/1.4 AF STM (Fuji X)',
+    serial: '62019',
+    details: 'Xác nhận đã bán lens VILTROX 56mm f/1.4 AF STM (Serial: 62019) cho khách, thực hiện bởi Đỗ Minh Trí tại chi nhánh 42 Huỳnh Thúc Kháng.'
+  },
+  {
+    id: 'hist_18',
+    type: LOG_TYPE.SELL,
+    date: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+    staff: 'Trần Văn Nam',
+    location: '74 Bà Triệu',
+    productName: 'CANON EOS R5 Mark II',
+    serial: '81029',
+    details: 'Xác nhận đã bán máy CANON EOS R5 Mark II (Serial: 81029) cho khách, thực hiện bởi Trần Văn Nam tại chi nhánh 74 Bà Triệu.'
+  },
+  {
+    id: 'hist_19',
+    type: LOG_TYPE.SYSTEM,
+    date: new Date(Date.now() - 11 * 24 * 60 * 60 * 1000).toISOString(),
+    staff: 'Hệ thống',
+    location: '193 Giảng Võ',
+    productName: 'SONY A7 IV',
+    serial: '66182',
+    details: 'Hệ thống tự động hủy cọc quá hạn 1 tuần (đặt bởi Lê Hồng Quân tại 193 Giảng Võ). Máy SONY A7 IV đã trả về trạng thái Còn hàng.'
+  },
+  {
+    id: 'hist_20',
+    type: LOG_TYPE.SELL,
+    date: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
+    staff: 'Nguyễn Việt Thịnh',
+    location: '193 NBK',
+    productName: 'TAMRON 17-28mm f/2.8 Di III RXD (Sony E)',
+    serial: '80291',
+    details: 'Xác nhận đã bán lens TAMRON 17-28mm f/2.8 (Serial: 80291) cho khách, thực hiện bởi Nguyễn Việt Thịnh tại chi nhánh 193 NBK.'
+  },
+  {
+    id: 'hist_21',
+    type: LOG_TYPE.SELL,
+    date: new Date(Date.now() - 16 * 24 * 60 * 60 * 1000).toISOString(),
+    staff: 'Trần Văn Nam',
+    location: '74 Bà Triệu',
+    productName: 'PHỤ KIỆN Lowepro Flipside 400 AW III',
+    serial: 'LP-FA400-8291',
+    details: 'Xác nhận đã bán túi Lowepro Flipside 400 AW III (Serial: LP-FA400-8291) cho khách, thực hiện bởi Trần Văn Nam tại chi nhánh 74 Bà Triệu.'
+  },
+  {
+    id: 'hist_22',
+    type: LOG_TYPE.SELL,
+    date: new Date(Date.now() - 18 * 24 * 60 * 60 * 1000).toISOString(),
+    staff: 'Lê Hồng Quân',
+    location: '193 Giảng Võ',
+    productName: 'SONY FX30',
+    serial: '72910',
+    details: 'Xác nhận đã bán máy SONY FX30 (Serial: 72910) cho khách, thực hiện bởi Lê Hồng Quân tại chi nhánh 193 Giảng Võ.'
+  },
+  {
+    id: 'hist_23',
+    type: LOG_TYPE.SELL,
+    date: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(),
+    staff: 'Lê Hồng Quân',
+    location: '193 Giảng Võ',
+    productName: 'LEICA M11 Monochrom',
+    serial: '19920',
+    details: 'Xác nhận đã bán máy LEICA M11 Monochrom (Serial: 19920) cho khách, thực hiện bởi Lê Hồng Quân tại chi nhánh 193 Giảng Võ.'
+  },
+  {
+    id: 'hist_24',
+    type: LOG_TYPE.SYSTEM,
+    date: new Date(Date.now() - 22 * 24 * 60 * 60 * 1000).toISOString(),
+    staff: 'Hệ thống',
+    location: '193 NBK',
+    productName: 'FUJI X-T5',
+    serial: '38192',
+    details: 'Hệ thống tự động hủy cọc quá hạn 1 tuần (đặt bởi Nguyễn Việt Thịnh tại 193 NBK). Máy FUJI X-T5 đã trả về trạng thái Còn hàng.'
+  },
+  {
+    id: 'hist_25',
+    type: LOG_TYPE.SELL,
+    date: new Date(Date.now() - 21 * 24 * 60 * 60 * 1000).toISOString(),
+    staff: 'Lê Hồng Quân',
+    location: '193 Giảng Võ',
+    productName: 'FUJI X-E4',
+    serial: '29182',
+    details: 'Xác nhận đã bán máy FUJI X-E4 (Serial: 29182) cho khách, thực hiện bởi Lê Hồng Quân tại chi nhánh 193 Giảng Võ.'
+  },
+  {
+    id: 'hist_26',
+    type: LOG_TYPE.IMPORT,
+    date: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000).toISOString(),
+    staff: 'Trần Văn Nam',
+    location: '74 Bà Triệu',
+    productName: 'CANON EOS R5 Mark II',
+    serial: '81029',
+    details: 'Nhập kho máy cũ CANON EOS R5 Mark II ngoại hình 99% bởi Trần Văn Nam.'
+  },
+  {
+    id: 'hist_27',
+    type: LOG_TYPE.IMPORT,
+    date: new Date(Date.now() - 26 * 24 * 60 * 60 * 1000).toISOString(),
+    staff: 'Trần Văn Nam',
+    location: '74 Bà Triệu',
+    productName: 'PHỤ KIỆN Lowepro Flipside 400 AW III',
+    serial: 'LP-FA400-8291',
+    details: 'Nhập kho túi Lowepro Flipside 400 AW III ngoại hình 96% bởi Trần Văn Nam.'
+  },
+  {
+    id: 'hist_28',
+    type: LOG_TYPE.IMPORT,
+    date: new Date(Date.now() - 28 * 24 * 60 * 60 * 1000).toISOString(),
+    staff: 'Lê Hồng Quân',
+    location: '193 Giảng Võ',
+    productName: 'FUJI X-E4',
+    serial: '29182',
+    details: 'Nhập kho máy cũ FUJI X-E4 ngoại hình 93% bởi Lê Hồng Quân.'
+  },
+  {
+    id: 'hist_29',
+    type: LOG_TYPE.IMPORT,
+    date: new Date(Date.now() - 18 * 24 * 60 * 60 * 1000).toISOString(),
+    staff: 'Đỗ Minh Trí',
+    location: '42 Huỳnh Thúc Kháng',
+    productName: 'VILTROX 56mm f/1.4 AF STM (Fuji X)',
+    serial: '62019',
+    details: 'Nhập kho lens VILTROX 56mm f/1.4 AF STM (Fuji X) ngoại hình 98% bởi Đỗ Minh Trí.'
+  },
+  {
+    id: 'hist_30',
+    type: LOG_TYPE.IMPORT,
+    date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+    staff: 'Lê Hồng Quân',
+    location: '193 Giảng Võ',
+    productName: 'SONY FX30',
+    serial: '72910',
+    details: 'Nhập kho máy cũ SONY FX30 Cinema Line ngoại hình 98% bởi Lê Hồng Quân.'
+  },
+  {
+    id: 'hist_31',
+    type: LOG_TYPE.IMPORT,
+    date: new Date(Date.now() - 35 * 24 * 60 * 60 * 1000).toISOString(),
+    staff: 'Lê Hồng Quân',
+    location: '193 Giảng Võ',
+    productName: 'LEICA M11 Monochrom',
+    serial: '19920',
+    details: 'Nhập kho máy cũ LEICA M11 Monochrom ngoại hình 99% bởi Lê Hồng Quân.'
+  },
+  {
+    id: 'hist_32',
+    type: LOG_TYPE.IMPORT,
+    date: new Date(Date.now() - 22 * 24 * 60 * 60 * 1000).toISOString(),
+    staff: 'Nguyễn Việt Thịnh',
+    location: '193 NBK',
+    productName: 'TAMRON 17-28mm f/2.8 Di III RXD (Sony E)',
+    serial: '80291',
+    details: 'Nhập kho lens TAMRON 17-28mm f/2.8 Di III RXD (Sony E) ngoại hình 97% bởi Nguyễn Việt Thịnh.'
   }
 ];
 
