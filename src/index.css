@@ -1535,16 +1535,20 @@ body {
   margin-bottom: 24px;
 }
 
-.btnExportStats {
-  display: inline-flex;
-  align-items: center;
+.statsHeaderActions {
+  display: flex;
   gap: 8px;
   flex-shrink: 0;
-  background: var(--brand-dark);
-  color: #ffffff;
+}
+
+.btnExportStats,
+.btnPrintStats {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   border: none;
   border-radius: 10px;
-  padding: 10px 18px;
+  padding: 10px 16px;
   font-family: var(--font-primary);
   font-size: 13px;
   font-weight: 700;
@@ -1553,8 +1557,23 @@ body {
   white-space: nowrap;
 }
 
+.btnExportStats {
+  background: var(--brand-dark);
+  color: #ffffff;
+}
+
 .btnExportStats:hover {
   background: var(--brand-red);
+}
+
+.btnPrintStats {
+  background: var(--bg-light);
+  color: var(--text-primary-light);
+  border: 1px solid var(--border-light);
+}
+
+.btnPrintStats:hover {
+  background: var(--border-light);
 }
 
 /* KPI grid */

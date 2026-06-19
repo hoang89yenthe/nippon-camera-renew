@@ -1595,6 +1595,202 @@ export default function App() {
     showToast(`Đã xuất báo cáo: ${fileName}`);
   };
 
+  const handlePrintStats = () => {
+    const today = new Date();
+    const dateStr = today.toLocaleDateString('vi-VN', {
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+    });
+    const fn = (n) => n.toLocaleString('vi-VN');
+    const frev = (n) => {
+      if (n >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(1)} tỷ đ`;
+      if (n >= 1_000_000)     return `${(n / 1_000_000).toFixed(1)} triệu đ`;
+      return fn(n) + ' đ';
+    };
+
+    const locRows = stats.byLocation.map(({ key, rev, count }) =>
+      `<tr><td>${key}</td><td class="num">${fn(rev)}</td><td class="num">${count}</td></tr>`
+    ).join('');
+
+    const staffRows = stats.byStaff.map(({ key, rev, count }) =>
+      `<tr><td>${key}</td><td class="num">${fn(rev)}</td><td class="num">${count}</td></tr>`
+    ).join('');
+
+    const brandRows = stats.byBrand.map(({ key, rev, count }) =>
+      `<tr><td>${key}</td><td class="num">${fn(rev)}</td><td class="num">${count}</td></tr>`
+    ).join('');
+
+    const detailRows = [...stats.allSold]
+      .sort((a, b) => new Date(b.sellInfo?.date || 0) - new Date(a.sellInfo?.date || 0))
+      .map((p, i) => {
+        const sellDate = p.sellInfo?.date
+          ? new Date(p.sellInfo.date).toLocaleDateString('vi-VN')
+          : '—';
+        return `<tr>
+          <td class="num">${i + 1}</td>
+          <td>${p.brand}</td>
+          <td>${p.name}</td>
+          <td>${p.serial}</td>
+          <td class="num">${fn(p.price)}</td>
+          <td>${p.sellInfo?.staff || p.staff}</td>
+          <td>${p.sellInfo?.location || p.location}</td>
+          <td>${sellDate}</td>
+        </tr>`;
+      }).join('');
+
+    const noSoldMsg = stats.allSold.length === 0
+      ? '<tr><td colspan="8" style="text-align:center;color:#999;padding:16px">Chưa có sản phẩm nào được bán.</td></tr>'
+      : detailRows;
+
+    const html = `<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <title>Báo cáo doanh số — Nippon Camera</title>
+  <style>
+    @page { size: A4 portrait; margin: 15mm 18mm; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; font-size: 11px; color: #222; background: #fff; }
+
+    /* ── Header ── */
+    .rpt-header { text-align: center; margin-bottom: 22px; padding-bottom: 14px; border-bottom: 3px solid #c7282a; }
+    .rpt-store { font-size: 26px; font-weight: 900; letter-spacing: 3px; color: #c7282a; }
+    .rpt-title { font-size: 15px; font-weight: 700; margin: 6px 0 3px; text-transform: uppercase; letter-spacing: 1px; }
+    .rpt-date  { font-size: 11px; color: #666; }
+
+    /* ── KPI row ── */
+    .kpi-row { display: flex; gap: 10px; margin-bottom: 20px; }
+    .kpi-box { flex: 1; border: 1px solid #e0e0e0; border-radius: 8px; padding: 10px 12px; text-align: center; }
+    .kpi-lbl { font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; color: #888; }
+    .kpi-val { font-size: 20px; font-weight: 900; margin: 4px 0 2px; color: #231f20; }
+    .kpi-sub { font-size: 10px; color: #aaa; }
+    .kpi-box.revenue .kpi-val { color: #c7282a; font-size: 17px; }
+
+    /* ── Sections ── */
+    .section { margin-bottom: 18px; page-break-inside: avoid; }
+    .section-title {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1px; color: #c7282a;
+      margin-bottom: 7px; padding-bottom: 4px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    .two-col { display: flex; gap: 18px; margin-bottom: 18px; }
+    .two-col .section { flex: 1; margin-bottom: 0; }
+
+    /* ── Tables ── */
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      background: #f5f5f5; text-align: left; padding: 6px 8px;
+      font-size: 9px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.4px; border-bottom: 1px solid #ccc;
+    }
+    td { padding: 5px 8px; border-bottom: 1px solid #f0f0f0; font-size: 10.5px; }
+    tr:last-child td { border-bottom: none; }
+    .num { text-align: right; font-variant-numeric: tabular-nums; }
+
+    /* ── Footer ── */
+    .rpt-footer {
+      margin-top: 24px; padding-top: 10px;
+      border-top: 1px solid #e0e0e0;
+      text-align: center; font-size: 9.5px; color: #aaa;
+    }
+
+    @media print {
+      body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+  <div class="rpt-header">
+    <div class="rpt-store">NIPPON CAMERA</div>
+    <div class="rpt-title">Báo cáo doanh số</div>
+    <div class="rpt-date">${dateStr}</div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi-box revenue">
+      <div class="kpi-lbl">Doanh thu đã bán</div>
+      <div class="kpi-val">${frev(stats.totalRevenue)}</div>
+      <div class="kpi-sub">${stats.soldCount} sản phẩm</div>
+    </div>
+    <div class="kpi-box">
+      <div class="kpi-lbl">Đã bán</div>
+      <div class="kpi-val">${stats.soldCount}</div>
+      <div class="kpi-sub">sản phẩm</div>
+    </div>
+    <div class="kpi-box">
+      <div class="kpi-lbl">Đang giữ cọc</div>
+      <div class="kpi-val">${stats.depositedCount}</div>
+      <div class="kpi-sub">sản phẩm</div>
+    </div>
+    <div class="kpi-box">
+      <div class="kpi-lbl">Tồn kho</div>
+      <div class="kpi-val">${stats.inStockCount}</div>
+      <div class="kpi-sub">/ ${stats.totalCount} tổng</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="section">
+      <div class="section-title">Doanh thu theo chi nhánh</div>
+      <table>
+        <thead><tr><th>Chi nhánh</th><th class="num">Doanh thu (đ)</th><th class="num">Máy</th></tr></thead>
+        <tbody>${locRows || '<tr><td colspan="3" style="color:#aaa;text-align:center">Chưa có dữ liệu</td></tr>'}</tbody>
+      </table>
+    </div>
+    <div class="section">
+      <div class="section-title">Doanh thu theo nhân viên</div>
+      <table>
+        <thead><tr><th>Nhân viên</th><th class="num">Doanh thu (đ)</th><th class="num">Máy</th></tr></thead>
+        <tbody>${staffRows || '<tr><td colspan="3" style="color:#aaa;text-align:center">Chưa có dữ liệu</td></tr>'}</tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Doanh thu theo thương hiệu</div>
+    <table>
+      <thead><tr><th>Thương hiệu</th><th class="num">Doanh thu (đ)</th><th class="num">Máy đã bán</th></tr></thead>
+      <tbody>${brandRows || '<tr><td colspan="3" style="color:#aaa;text-align:center">Chưa có dữ liệu</td></tr>'}</tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Chi tiết sản phẩm đã bán</div>
+    <table>
+      <thead>
+        <tr>
+          <th class="num">#</th>
+          <th>Hãng</th>
+          <th>Tên máy</th>
+          <th>Serial</th>
+          <th class="num">Giá bán (đ)</th>
+          <th>Nhân viên</th>
+          <th>Chi nhánh</th>
+          <th>Ngày bán</th>
+        </tr>
+      </thead>
+      <tbody>${noSoldMsg}</tbody>
+    </table>
+  </div>
+
+  <div class="rpt-footer">
+    Báo cáo được tạo tự động từ hệ thống Nippon Camera &nbsp;|&nbsp; ${dateStr}
+  </div>
+
+  <script>
+    window.onload = function () {
+      window.print();
+      window.onafterprint = function () { window.close(); };
+    };
+  </script>
+</body>
+</html>`;
+
+    const w = window.open('', '_blank', 'width=900,height=700');
+    w.document.write(html);
+    w.document.close();
+  };
+
   const handleExportDB = () => {
     triggerJsonDownload(
       { products, history },
@@ -2603,14 +2799,24 @@ export default function App() {
               <h2 style={{ margin: 0 }}>THỐNG KÊ DOANH SỐ</h2>
               <p className="viewSubtitle" style={{ marginTop: 4 }}>Tổng quan hoạt động kinh doanh tại tất cả chi nhánh.</p>
             </div>
-            <button className="btnExportStats" onClick={handleExportStats}>
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                <polyline points="7 10 12 15 17 10"/>
-                <line x1="12" y1="15" x2="12" y2="3"/>
-              </svg>
-              Xuất Excel
-            </button>
+            <div className="statsHeaderActions">
+              <button className="btnPrintStats" onClick={handlePrintStats}>
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <polyline points="6 9 6 2 18 2 18 9"/>
+                  <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+                  <rect x="6" y="14" width="12" height="8"/>
+                </svg>
+                In báo cáo
+              </button>
+              <button className="btnExportStats" onClick={handleExportStats}>
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Xuất Excel
+              </button>
+            </div>
           </div>
 
           {/* KPI Cards */}
