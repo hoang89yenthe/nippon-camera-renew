@@ -268,6 +268,36 @@ body {
   background-color: #82e0aa;
 }
 
+/* ── BACK BUTTON (shared across views) ── */
+.viewBackBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-primary);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-secondary-light);
+  padding: 0;
+  margin-bottom: 20px;
+  transition: color 0.2s;
+}
+
+.viewBackBtn:hover {
+  color: var(--brand-red);
+}
+
+.viewBackBtn svg {
+  flex-shrink: 0;
+  transition: transform 0.2s;
+}
+
+.viewBackBtn:hover svg {
+  transform: translateX(-3px);
+}
+
 /* ── 4. BRAND LIST VIEW (Screen 4) ── */
 .brandListHeader {
   display: flex;

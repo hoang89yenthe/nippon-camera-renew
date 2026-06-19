@@ -1730,6 +1730,16 @@ export default function App() {
           {/* 2. SUB-BRAND PRODUCT LIST VIEW */}
           {currentBrand && !currentProduct && (
             <div id="brand-list">
+              <button
+                className="viewBackBtn"
+                onClick={() => { setCurrentBrand(null); setCurrentPage(1); }}
+              >
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <polyline points="15 18 9 12 15 6"/>
+                </svg>
+                Tất cả thương hiệu
+              </button>
+
               <div className="brandListHeader">
                 <div className="brandBranding">
                   <div className="brandLogoWrapper">
@@ -1817,6 +1827,16 @@ export default function App() {
           {/* 3. PRODUCT DETAILS VIEW */}
           {currentProduct && !editMode && (
             <div id="product-detail">
+              <button
+                className="viewBackBtn"
+                onClick={() => setCurrentProduct(null)}
+              >
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <polyline points="15 18 9 12 15 6"/>
+                </svg>
+                {currentProduct.brand}
+              </button>
+
               {/* Breadcrumbs */}
               <div className="breadcrumbs">
                 <button
@@ -2002,26 +2022,12 @@ export default function App() {
           {/* ── EDIT PRODUCT FORM ── */}
           {currentProduct && editMode && editDraft && (
             <div id="product-edit">
-              <div className="breadcrumbs">
-                <button
-                  className="bcHomeBtn"
-                  onClick={() => { handleCancelEdit(); setCurrentProduct(null); setCurrentBrand(null); }}
-                >
-                  <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-                    <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
-                  </svg>
-                </button>
-                <span className="bcSeparator">/</span>
-                <button className="bcBrandBtn" onClick={() => { handleCancelEdit(); setCurrentProduct(null); }}>
-                  {currentProduct.brand}
-                </button>
-                <span className="bcSeparator">/</span>
-                <button className="bcBrandBtn" onClick={handleCancelEdit}>
-                  {currentProduct.name}
-                </button>
-                <span className="bcSeparator">/</span>
-                <span className="bcProduct">Chỉnh sửa</span>
-              </div>
+              <button className="viewBackBtn" onClick={handleCancelEdit}>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <polyline points="15 18 9 12 15 6"/>
+                </svg>
+                {currentProduct.name}
+              </button>
 
               <div className="viewHeader" style={{ textAlign: 'left', marginBottom: '20px' }}>
                 <h2 style={{ marginBottom: '4px' }}>CHỈNH SỬA THÔNG TIN</h2>
