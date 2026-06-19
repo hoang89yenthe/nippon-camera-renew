@@ -1240,6 +1240,10 @@ export default function App() {
   const [historyQuery, setHistoryQuery] = useState('');
   const [historyTypeFilter, setHistoryTypeFilter] = useState('');
 
+  // Edit product state
+  const [editMode, setEditMode] = useState(false);
+  const [editDraft, setEditDraft] = useState(null);
+
   // FIX #5 & #8: Refs instead of DOM queries
   const toastTimerRef = useRef(null);
   const importFileRef = useRef(null);
@@ -1411,6 +1415,42 @@ export default function App() {
     );
 
     showToast(`Đã giải phóng máy ${currentProduct.name} về trạng thái Còn hàng!`);
+  };
+
+  // ── Edit product handlers ──
+  const setDraftField = (field, value) =>
+    setEditDraft(prev => ({ ...prev, [field]: value }));
+
+  const handleEnterEdit = () => {
+    setEditDraft({ ...currentProduct });
+    setEditMode(true);
+  };
+
+  const handleCancelEdit = () => {
+    setEditMode(false);
+    setEditDraft(null);
+  };
+
+  const handleSaveEdit = (e) => {
+    e.preventDefault();
+    const updated = {
+      ...editDraft,
+      price: parseInt(editDraft.price, 10),
+      condition: parseInt(editDraft.condition, 10),
+    };
+    setProducts(prev => prev.map(p => p.id === updated.id ? updated : p));
+    setCurrentProduct(updated);
+    addLog(
+      LOG_TYPE.SYSTEM,
+      updated.staff,
+      updated.location,
+      `${updated.brand} ${updated.name}`,
+      updated.serial,
+      `Cập nhật thông tin sản phẩm ${updated.brand} ${updated.name} (Serial: ${updated.serial}) bởi ${updated.staff}.`
+    );
+    showToast(`Đã cập nhật thông tin máy ${updated.name} thành công!`);
+    setEditMode(false);
+    setEditDraft(null);
   };
 
   // FIX #6: Save full staff name — was incorrectly trimming to last word only
@@ -1756,7 +1796,7 @@ export default function App() {
           )}
 
           {/* 3. PRODUCT DETAILS VIEW */}
-          {currentProduct && (
+          {currentProduct && !editMode && (
             <div id="product-detail">
               {/* Breadcrumbs */}
               <div className="breadcrumbs">
@@ -1904,7 +1944,6 @@ export default function App() {
                 </div>
 
                 <div className="actionsWrapper">
-                  {/* FIX #2: PRODUCT_STATUS constants replace magic strings */}
                   {currentProduct.status === PRODUCT_STATUS.IN_STOCK ? (
                     <>
                       <button className="actionBtn btnBan" onClick={() => setSellModalOpen(true)}>
@@ -1931,8 +1970,193 @@ export default function App() {
                       </button>
                     </>
                   )}
+                  <button className="actionBtn btnEdit" onClick={handleEnterEdit}>
+                    CHỈNH SỬA THÔNG TIN
+                  </button>
                 </div>
               </div>
+            </div>
+          )}
+          {/* ── EDIT PRODUCT FORM ── */}
+          {currentProduct && editMode && editDraft && (
+            <div id="product-edit">
+              <div className="breadcrumbs">
+                <button
+                  className="bcHomeBtn"
+                  onClick={() => { handleCancelEdit(); setCurrentProduct(null); setCurrentBrand(null); }}
+                >
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                    <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                  </svg>
+                </button>
+                <span className="bcSeparator">/</span>
+                <button className="bcBrandBtn" onClick={() => { handleCancelEdit(); setCurrentProduct(null); }}>
+                  {currentProduct.brand}
+                </button>
+                <span className="bcSeparator">/</span>
+                <button className="bcBrandBtn" onClick={handleCancelEdit}>
+                  {currentProduct.name}
+                </button>
+                <span className="bcSeparator">/</span>
+                <span className="bcProduct">Chỉnh sửa</span>
+              </div>
+
+              <div className="viewHeader" style={{ textAlign: 'left', marginBottom: '20px' }}>
+                <h2 style={{ marginBottom: '4px' }}>CHỈNH SỬA THÔNG TIN</h2>
+                <p className="viewSubtitle">{currentProduct.brand} {currentProduct.name} — Serial: {currentProduct.serial}</p>
+              </div>
+
+              <form onSubmit={handleSaveEdit} className="entryForm">
+                <div className="formGrid">
+                  <div className="formGroup">
+                    <label htmlFor="e-brand">Thương hiệu *</label>
+                    <select id="e-brand" value={editDraft.brand} onChange={e => setDraftField('brand', e.target.value)}>
+                      {Object.keys(BRAND_SLOGANS).map(b => (
+                        <option key={b} value={b}>{b}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="formGroup">
+                    <label htmlFor="e-name">Tên model *</label>
+                    <input
+                      type="text"
+                      id="e-name"
+                      value={editDraft.name}
+                      onChange={e => setDraftField('name', e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  <div className="formGroup">
+                    <label htmlFor="e-color">Màu sắc *</label>
+                    <div className="colorInputWrapper">
+                      <input
+                        type="color"
+                        id="e-color"
+                        value={editDraft.color}
+                        onChange={e => setDraftField('color', e.target.value)}
+                      />
+                      <input
+                        type="text"
+                        value={editDraft.color}
+                        onChange={e => setDraftField('color', e.target.value)}
+                        placeholder="#000000"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="formGroup">
+                    <label htmlFor="e-price">Giá bán (VNĐ) *</label>
+                    <input
+                      type="number"
+                      id="e-price"
+                      value={editDraft.price}
+                      onChange={e => setDraftField('price', e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  <div className="formGroup">
+                    <label htmlFor="e-serial">Mã Serial *</label>
+                    <input
+                      type="text"
+                      id="e-serial"
+                      value={editDraft.serial}
+                      onChange={e => setDraftField('serial', e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  <div className="formGroup">
+                    <label htmlFor="e-shot">Số shot chụp *</label>
+                    <input
+                      type="text"
+                      id="e-shot"
+                      value={editDraft.shotCount}
+                      onChange={e => setDraftField('shotCount', e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  <div className="formGroup">
+                    <label htmlFor="e-location">Vị trí kho máy *</label>
+                    <select id="e-location" value={editDraft.location} onChange={e => setDraftField('location', e.target.value)}>
+                      {LOCATIONS.map(l => <option key={l} value={l}>{l}</option>)}
+                    </select>
+                  </div>
+
+                  <div className="formGroup">
+                    <label htmlFor="e-staff">Nhân viên phụ trách *</label>
+                    <select id="e-staff" value={editDraft.staff} onChange={e => setDraftField('staff', e.target.value)}>
+                      {STAFFS.map(s => <option key={s} value={s}>{s}</option>)}
+                    </select>
+                  </div>
+
+                  <div className="formGroup">
+                    <label htmlFor="e-condition">Tình trạng máy (%) *</label>
+                    <input
+                      type="number"
+                      id="e-condition"
+                      min="1"
+                      max="100"
+                      value={editDraft.condition}
+                      onChange={e => setDraftField('condition', e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  <div className="formGroup checkboxGroup">
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={editDraft.box}
+                        onChange={e => setDraftField('box', e.target.checked)}
+                      />{' '}
+                      Máy kèm Hộp (Fullbox)
+                    </label>
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={editDraft.lens}
+                        onChange={e => setDraftField('lens', e.target.checked)}
+                      />{' '}
+                      Máy đi kèm Ống kính (Lens Kit)
+                    </label>
+                  </div>
+                </div>
+
+                <div className="formGroup fullWidth">
+                  <label htmlFor="e-accessories">Phụ kiện kèm theo *</label>
+                  <input
+                    type="text"
+                    id="e-accessories"
+                    value={editDraft.accessories}
+                    onChange={e => setDraftField('accessories', e.target.value)}
+                    required
+                  />
+                </div>
+
+                <div className="formGroup fullWidth">
+                  <label htmlFor="e-desc">Mô tả tình trạng ngoại hình *</label>
+                  <textarea
+                    id="e-desc"
+                    rows="3"
+                    value={editDraft.description}
+                    onChange={e => setDraftField('description', e.target.value)}
+                    required
+                  />
+                </div>
+
+                <div className="editFormActions">
+                  <button type="button" className="cancelEditBtn" onClick={handleCancelEdit}>
+                    HỦY
+                  </button>
+                  <button type="submit" className="submitBtn editSubmitBtn">
+                    LƯU THAY ĐỔI
+                  </button>
+                </div>
+              </form>
             </div>
           )}
         </div>

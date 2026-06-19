@@ -1657,3 +1657,47 @@ body {
     font-size: 12px;
   }
 }
+
+/* ── 11. EDIT PRODUCT FORM ── */
+.btnEdit {
+  background-color: transparent;
+  border: 1.5px solid var(--border-light);
+  color: var(--text-secondary-light);
+  margin-top: 4px;
+}
+
+.btnEdit:hover {
+  border-color: var(--brand-dark);
+  color: var(--brand-dark);
+  background-color: transparent;
+}
+
+.editFormActions {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.cancelEditBtn {
+  flex: 1;
+  height: 48px;
+  border-radius: 24px;
+  border: 1.5px solid var(--border-light);
+  background-color: #ffffff;
+  font-family: var(--font-primary);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-secondary-light);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancelEditBtn:hover {
+  border-color: var(--brand-dark);
+  color: var(--brand-dark);
+}
+
+.editSubmitBtn {
+  flex: 2;
+  margin-top: 0;
+}
