@@ -1526,6 +1526,37 @@ body {
   margin: 0 auto;
 }
 
+/* Stats header row */
+.statsViewHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.btnExportStats {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  background: var(--brand-dark);
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 18px;
+  font-family: var(--font-primary);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+.btnExportStats:hover {
+  background: var(--brand-red);
+}
+
 /* KPI grid */
 .kpiGrid {
   display: grid;

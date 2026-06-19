@@ -1528,6 +1528,73 @@ export default function App() {
     setCurrentTab('check-gia');
   };
 
+  const handleExportStats = async () => {
+    const XLSX = await import('xlsx');
+    const today = new Date();
+    const dateStr = today.toLocaleDateString('vi-VN');
+    const fileName = `BaoCaoDoanhSo_${today.toISOString().slice(0, 10)}.xlsx`;
+
+    const wb = XLSX.utils.book_new();
+
+    /* Sheet 1 — Tổng quan */
+    const ws1 = XLSX.utils.aoa_to_sheet([
+      ['BÁO CÁO DOANH SỐ — NIPPON CAMERA'],
+      ['Ngày xuất:', dateStr],
+      [],
+      ['CHỈ SỐ', 'GIÁ TRỊ'],
+      ['Tổng doanh thu đã bán (VND)', stats.totalRevenue],
+      ['Số sản phẩm đã bán', stats.soldCount],
+      ['Số sản phẩm đang giữ cọc', stats.depositedCount],
+      ['Số sản phẩm tồn kho', stats.inStockCount],
+      ['Tổng sản phẩm trong hệ thống', stats.totalCount],
+    ]);
+    XLSX.utils.book_append_sheet(wb, ws1, 'Tổng quan');
+
+    /* Sheet 2 — Theo chi nhánh */
+    const ws2 = XLSX.utils.aoa_to_sheet([
+      ['CHI NHÁNH', 'DOANH THU (VND)', 'SỐ MÁY ĐÃ BÁN'],
+      ...stats.byLocation.map(({ key, rev, count }) => [key, rev, count]),
+    ]);
+    XLSX.utils.book_append_sheet(wb, ws2, 'Theo chi nhánh');
+
+    /* Sheet 3 — Theo nhân viên */
+    const ws3 = XLSX.utils.aoa_to_sheet([
+      ['NHÂN VIÊN', 'DOANH THU (VND)', 'SỐ MÁY ĐÃ BÁN'],
+      ...stats.byStaff.map(({ key, rev, count }) => [key, rev, count]),
+    ]);
+    XLSX.utils.book_append_sheet(wb, ws3, 'Theo nhân viên');
+
+    /* Sheet 4 — Theo thương hiệu */
+    const ws4 = XLSX.utils.aoa_to_sheet([
+      ['THƯƠNG HIỆU', 'DOANH THU (VND)', 'SỐ MÁY ĐÃ BÁN'],
+      ...stats.byBrand.map(({ key, rev, count }) => [key, rev, count]),
+    ]);
+    XLSX.utils.book_append_sheet(wb, ws4, 'Theo thương hiệu');
+
+    /* Sheet 5 — Chi tiết sản phẩm đã bán */
+    const ws5 = XLSX.utils.aoa_to_sheet([
+      ['STT', 'THƯƠNG HIỆU', 'TÊN MÁY', 'SERIAL', 'GIÁ BÁN (VND)', 'NHÂN VIÊN BÁN', 'CHI NHÁNH BÁN', 'NGÀY BÁN'],
+      ...[...stats.allSold]
+        .sort((a, b) => new Date(b.sellInfo?.date || 0) - new Date(a.sellInfo?.date || 0))
+        .map((p, i) => [
+          i + 1,
+          p.brand,
+          p.name,
+          p.serial,
+          p.price,
+          p.sellInfo?.staff    || p.staff,
+          p.sellInfo?.location || p.location,
+          p.sellInfo?.date
+            ? new Date(p.sellInfo.date).toLocaleDateString('vi-VN')
+            : '',
+        ]),
+    ]);
+    XLSX.utils.book_append_sheet(wb, ws5, 'Chi tiết đã bán');
+
+    XLSX.writeFile(wb, fileName);
+    showToast(`Đã xuất báo cáo: ${fileName}`);
+  };
+
   const handleExportDB = () => {
     triggerJsonDownload(
       { products, history },
@@ -1609,6 +1676,7 @@ export default function App() {
       byLocation: groupBy(sold, p => p.sellInfo?.location || p.location),
       byStaff:    groupBy(sold, p => p.sellInfo?.staff    || p.staff),
       byBrand:    groupBy(sold, p => p.brand),
+      allSold:     sold,
       topProducts: [...sold].sort((a, b) => b.price - a.price).slice(0, 5),
       logCounts:  Object.fromEntries(
         Object.values(LOG_TYPE).map(t => [t, history.filter(l => l.type === t).length])
@@ -2530,9 +2598,19 @@ export default function App() {
       {/* ── SUBVIEW: THỐNG KÊ DOANH SỐ ── */}
       {currentTab === 'thong-ke' && (
         <div id="thong-ke-view">
-          <div className="viewHeader">
-            <h2>THỐNG KÊ DOANH SỐ</h2>
-            <p className="viewSubtitle">Tổng quan hoạt động kinh doanh tại tất cả chi nhánh.</p>
+          <div className="statsViewHeader">
+            <div>
+              <h2 style={{ margin: 0 }}>THỐNG KÊ DOANH SỐ</h2>
+              <p className="viewSubtitle" style={{ marginTop: 4 }}>Tổng quan hoạt động kinh doanh tại tất cả chi nhánh.</p>
+            </div>
+            <button className="btnExportStats" onClick={handleExportStats}>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              Xuất Excel
+            </button>
           </div>
 
           {/* KPI Cards */}
