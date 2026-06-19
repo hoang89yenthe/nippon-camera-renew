@@ -1236,6 +1236,10 @@ export default function App() {
 
   const [toast, setToast] = useState(null);
 
+  // History search state
+  const [historyQuery, setHistoryQuery] = useState('');
+  const [historyTypeFilter, setHistoryTypeFilter] = useState('');
+
   // FIX #5 & #8: Refs instead of DOM queries
   const toastTimerRef = useRef(null);
   const importFileRef = useRef(null);
@@ -1493,6 +1497,24 @@ export default function App() {
   // 3. SELECTION & FILTER LOGIC
   // ════════════════════════════════════════════════════
 
+  const filteredHistory = useMemo(() => {
+    let result = history;
+    if (historyTypeFilter) {
+      result = result.filter(log => log.type === historyTypeFilter);
+    }
+    if (historyQuery.trim()) {
+      const q = historyQuery.toLowerCase().trim();
+      result = result.filter(log =>
+        log.productName?.toLowerCase().includes(q) ||
+        log.staff?.toLowerCase().includes(q) ||
+        log.location?.toLowerCase().includes(q) ||
+        log.serial?.toLowerCase().includes(q) ||
+        log.details?.toLowerCase().includes(q)
+      );
+    }
+    return result;
+  }, [history, historyQuery, historyTypeFilter]);
+
   const handleTabChange = (tab) => {
     setCurrentTab(tab);
     if (tab !== 'check-gia') {
@@ -1500,6 +1522,10 @@ export default function App() {
       setCurrentProduct(null);
       setSearchQuery('');
       setPriceFilter('');
+    }
+    if (tab !== 'lich-su') {
+      setHistoryQuery('');
+      setHistoryTypeFilter('');
     }
   };
 
@@ -2116,14 +2142,68 @@ export default function App() {
             <p className="viewSubtitle">Theo dõi toàn bộ các hoạt động nhập kho, bán hàng và nhận cọc tại các chi nhánh.</p>
           </div>
 
-          <div className="historyTimeline">
-            {history.length === 0 ? (
-              <p className="noHistory">Chưa có hoạt động giao dịch nào được ghi nhận.</p>
-            ) : (
-              history.map(log => {
-                // FIX #2: LOG_DISPLAY lookup replaces repeated if-else chains
-                const { text: typeText, cls: typeClass } = LOG_DISPLAY[log.type] ?? LOG_DISPLAY[LOG_TYPE.SYSTEM];
+          {/* Search & Filter bar */}
+          <div className="historySearchBar">
+            <div className="historySearchBox">
+              <svg className="historySearchIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <circle cx="11" cy="11" r="8"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+              <input
+                type="text"
+                className="historySearchInput"
+                placeholder="Tìm theo tên máy, nhân viên, serial, chi nhánh..."
+                value={historyQuery}
+                onChange={e => setHistoryQuery(e.target.value)}
+                autoComplete="off"
+              />
+              {historyQuery && (
+                <button className="historyClearBtn" onClick={() => setHistoryQuery('')}>✕</button>
+              )}
+            </div>
 
+            <div className="historyTypeFilter">
+              {[
+                { value: '',               label: 'Tất cả' },
+                { value: LOG_TYPE.IMPORT,  label: 'Nhập kho' },
+                { value: LOG_TYPE.DEPOSIT, label: 'Cọc máy' },
+                { value: LOG_TYPE.SELL,    label: 'Đã bán' },
+                { value: LOG_TYPE.SYSTEM,  label: 'Hệ thống' },
+              ].map(({ value, label }) => (
+                <button
+                  key={value}
+                  className={`historyTypeBtn ${historyTypeFilter === value ? 'active' : ''} ${value ? LOG_DISPLAY[value]?.cls : ''}`}
+                  onClick={() => setHistoryTypeFilter(value)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            <p className="historyResultCount">
+              {filteredHistory.length === history.length
+                ? `${history.length} giao dịch`
+                : `${filteredHistory.length} / ${history.length} giao dịch`}
+            </p>
+          </div>
+
+          <div className="historyTimeline">
+            {filteredHistory.length === 0 ? (
+              <div className="noHistory">
+                <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                <p>Không tìm thấy giao dịch nào phù hợp.</p>
+                <button
+                  className="historyClearFilterBtn"
+                  onClick={() => { setHistoryQuery(''); setHistoryTypeFilter(''); }}
+                >
+                  Xoá bộ lọc
+                </button>
+              </div>
+            ) : (
+              filteredHistory.map(log => {
+                const { text: typeText, cls: typeClass } = LOG_DISPLAY[log.type] ?? LOG_DISPLAY[LOG_TYPE.SYSTEM];
                 return (
                   <div key={log.id} className="historyItem">
                     <div className="historyMeta">

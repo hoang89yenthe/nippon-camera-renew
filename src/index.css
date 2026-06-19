@@ -1486,3 +1486,174 @@ body {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* ── 10. HISTORY SEARCH & FILTER ── */
+.historySearchBar {
+  max-width: 800px;
+  width: 100%;
+  margin: 0 auto 24px auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.historySearchBox {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.historySearchIcon {
+  position: absolute;
+  left: 16px;
+  width: 18px;
+  height: 18px;
+  color: var(--text-secondary-light);
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+.historySearchInput {
+  width: 100%;
+  height: 48px;
+  padding: 0 44px 0 48px;
+  background-color: #ffffff;
+  border: 1px solid var(--border-light);
+  border-radius: 24px;
+  font-family: var(--font-primary);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--brand-dark);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-shadow: var(--shadow-sm);
+}
+
+.historySearchInput::placeholder {
+  color: #909399;
+}
+
+.historySearchInput:focus {
+  border-color: var(--brand-red);
+  box-shadow: 0 0 0 3px rgba(199, 40, 42, 0.1);
+}
+
+.historyClearBtn {
+  position: absolute;
+  right: 16px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #909399;
+  font-size: 14px;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.historyClearBtn:hover {
+  color: var(--brand-dark);
+}
+
+/* Type filter pill buttons */
+.historyTypeFilter {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.historyTypeBtn {
+  height: 32px;
+  padding: 0 14px;
+  border-radius: 16px;
+  border: 1px solid var(--border-light);
+  background-color: #ffffff;
+  font-family: var(--font-primary);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary-light);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.historyTypeBtn:hover {
+  border-color: #909399;
+  color: var(--brand-dark);
+}
+
+/* Active state inherits the log type colour */
+.historyTypeBtn.active {
+  color: #ffffff;
+  border-color: transparent;
+  background-color: var(--brand-dark);
+}
+
+.historyTypeBtn.active.type-nhap  { background-color: #2980b9; }
+.historyTypeBtn.active.type-coc   { background-color: var(--status-coc-text); }
+.historyTypeBtn.active.type-ban   { background-color: var(--status-ban-text); }
+.historyTypeBtn.active.type-system { background-color: #7f8c8d; }
+
+/* Result count */
+.historyResultCount {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary-light);
+  margin: 0;
+}
+
+/* Empty state for filtered results */
+.noHistory {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+  padding: 48px 0;
+  color: var(--text-secondary-light);
+  font-size: 16px;
+}
+
+.noHistory svg {
+  color: #d1d2d6;
+}
+
+.noHistory p {
+  margin: 0;
+  font-weight: 500;
+}
+
+.historyClearFilterBtn {
+  height: 36px;
+  padding: 0 20px;
+  border-radius: 18px;
+  border: 1px solid var(--border-light);
+  background-color: #ffffff;
+  font-family: var(--font-primary);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--brand-dark);
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 4px;
+}
+
+.historyClearFilterBtn:hover {
+  background-color: var(--brand-dark);
+  color: #ffffff;
+  border-color: var(--brand-dark);
+}
+
+@media (max-width: 768px) {
+  .historyTypeFilter {
+    gap: 6px;
+  }
+
+  .historyTypeBtn {
+    height: 28px;
+    padding: 0 10px;
+    font-size: 12px;
+  }
+}
