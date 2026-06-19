@@ -837,6 +837,59 @@ const INITIAL_PRODUCTS = [
   }
 ];
 
+// ── Real product photos (keyed by product id) ──
+const PRODUCT_PHOTOS = {
+  // FUJI
+  '37490': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Fujifilm_X-M5_-_1.jpg/600px-Fujifilm_X-M5_-_1.jpg',
+  '37491': 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Fujifilm_X-T5_4_nov_2022a.jpg/600px-Fujifilm_X-T5_4_nov_2022a.jpg',
+  '37492': 'https://fujifilm-x.b-cdn.net/wp-content/uploads/2021/09/x-t30-ii_thum_bxyg.jpg',
+  '37493': 'https://fujifilm-x.b-cdn.net/wp-content/uploads/2023/05/dwga_x-s20_thum.jpg',
+  '37494': 'https://fujifilm-x.b-cdn.net/wp-content/uploads/2024/02/stjw_x100vi_thum.jpg',
+  '37495': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Fujifilm_X_Pro3.jpg/600px-Fujifilm_X_Pro3.jpg',
+  '64490': 'https://fujifilm-x.b-cdn.net/wp-content/uploads/2021/01/x-e4_thumbnail_gkac.jpg',
+  '65490': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Fujifilm_GFX50S_II_10_nov_2021a.jpg/600px-Fujifilm_GFX50S_II_10_nov_2021a.jpg',
+  // SONY
+  '38490': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Sony_A7_IV_%28ILCE-7M4%29_-_by_Henry_S%C3%B6derlund_%2851739988735%29.jpg/600px-Sony_A7_IV_%28ILCE-7M4%29_-_by_Henry_S%C3%B6derlund_%2851739988735%29.jpg',
+  '49490': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Sony_ILCE-7CM2_8_nov_2023a.jpg/600px-Sony_ILCE-7CM2_8_nov_2023a.jpg',
+  '50490': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Sony_ZV-E10_with_Sony_E_16-50mm_F3.5-5.6_OSS_PZ_-_by_Henry_S%C3%B6derlund_%2851375243603%29.jpg/600px-Sony_ZV-E10_with_Sony_E_16-50mm_F3.5-5.6_OSS_PZ_-_by_Henry_S%C3%B6derlund_%2851375243603%29.jpg',
+  '51490': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Sony_FX30_with_Sony_E_10-20mm_F4_PZ_G_-_by_Henry_S%C3%B6derlund_%2852445895581%29.jpg/600px-Sony_FX30_with_Sony_E_10-20mm_F4_PZ_G_-_by_Henry_S%C3%B6derlund_%2852445895581%29.jpg',
+  // CANON
+  '39490': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Canon_EOS_R6_Mark_II_9_jan_2023a.jpg/600px-Canon_EOS_R6_Mark_II_9_jan_2023a.jpg',
+  '52490': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/Canon_EOS_R50_Black.jpg/600px-Canon_EOS_R50_Black.jpg',
+  '53490': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Canon_EOS_R5_Mark_II-8774.jpg/600px-Canon_EOS_R5_Mark_II-8774.jpg',
+  // DJI
+  '40490': 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/DJI_Osmo_Pocket_3_-_1.jpg/600px-DJI_Osmo_Pocket_3_-_1.jpg',
+  '54490': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/2024_Dron_DJI_Mini_4_Pro_%2801%29.jpg/600px-2024_Dron_DJI_Mini_4_Pro_%2801%29.jpg',
+  '55490': 'https://dji-official-fe.djicdn.com/dps/2a6b0dfad4c90c7fc543f8d1c9f32df5.jpg',
+  // NIKON
+  '41490': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Nikon_Z_fc_3_aug_2021a.jpg/600px-Nikon_Z_fc_3_aug_2021a.jpg',
+  '56490': 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Nikon_Z30.jpg/600px-Nikon_Z30.jpg',
+  '57490': 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Nikon_Z6III_13_jul_2024a.jpg/600px-Nikon_Z6III_13_jul_2024a.jpg',
+  // RICOH
+  '42490': 'https://us.ricoh-imaging.com/wp-content/uploads/2019/04/gr-iii-500.jpg',
+  '58490': 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/RICOH_GR_III_x_camera.jpg/600px-RICOH_GR_III_x_camera.jpg',
+  // SIGMA
+  '43490': 'https://www.sigmaphoto.com/media/catalog/product/cache/9d3f19d3b6579f1b9ef73ec013fd6bc2/a/0/a019_24_70_28_basic_3.png',
+  '59490': 'https://www.sigmaphoto.com/media/catalog/product/cache/9d3f19d3b6579f1b9ef73ec013fd6bc2/c/0/c021_18_50_28_basic_01_4.png',
+  // TAMRON
+  '44490': 'https://www.tamron.com/jp/consumer/pc_file/file/a063_01_pc.png',
+  '60490': 'https://www.tamron.com/jp/consumer/pc_file/file/a046_img01.jpg',
+  // VILTROX
+  '45490': 'https://viltrox.com/cdn/shop/files/AF85mm_F1.8_Z-780735.png?v=1718595016',
+  '61490': 'https://viltrox.com/cdn/shop/files/AF56mm_F1.4_XF-789704.png?v=1722921088',
+  // LEICA
+  '46490': 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Leica_Q2_-_front_view_-_by_Henry_S%C3%B6derlund_%2852561697609%29.jpg/600px-Leica_Q2_-_front_view_-_by_Henry_S%C3%B6derlund_%2852561697609%29.jpg',
+  '62490': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Leica_M11_Monochrom_L1000451.jpg/600px-Leica_M11_Monochrom_L1000451.jpg',
+  // HASSELBLAD
+  '47490': 'https://store-na.hasselblad.com/cdn/shop/files/X2D_692x692_4x_cecaf8af-26d4-461a-9eaa-7f90ea4647ab_330x330.png',
+  '63490': 'https://store-na.hasselblad.com/cdn/shop/files/907X.jpg',
+  // PHỤ KIỆN
+  '48490': 'https://www.peakdesign.com/cdn/shop/files/TT-CB-5-150-C-1.jpg?v=1689285879',
+  '66490': 'https://strobepro.com/cdn/shop/files/Godox_V1_Pro_flash_speedlite_strobepro_1_f860482f-6262-4db9-83dd-8643411caec0_5000x.jpg?v=1705606862',
+  '67490': 'https://cdn.lowepro.com/media/catalog/product/cache/29dcb5ccf179293005728ddc618b5922/c/a/camera-backpack-lowepro--flipside-iii-lp37352-pww.jpg',
+  '68490': 'https://kaseoptics.com/cdn/shop/files/1121600001.jpg?v=1684937445',
+};
+
 const INITIAL_HISTORY = [
   // ── Hôm nay / gần đây nhất ──
   {
@@ -2101,11 +2154,14 @@ export default function App() {
                         }}
                       >
                         <div className="productCardImage">
-                          <svg className="placeholder-img-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                            <circle cx="8.5" cy="8.5" r="1.5"/>
-                            <polyline points="21 15 16 10 5 21"/>
-                          </svg>
+                          {PRODUCT_PHOTOS[p.id]
+                            ? <img src={PRODUCT_PHOTOS[p.id]} alt={p.name} className="productCardImg" loading="lazy" />
+                            : <svg className="placeholder-img-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                <circle cx="8.5" cy="8.5" r="1.5"/>
+                                <polyline points="21 15 16 10 5 21"/>
+                              </svg>
+                          }
                         </div>
                         <div className="productCardInfo">
                           <div className={`productCardStatus ${statusClass}`}>{statusText}</div>
@@ -2240,26 +2296,35 @@ export default function App() {
                         className={`thumbItem ${idx === activeThumbIndex ? 'active' : ''}`}
                         onClick={() => setActiveThumbIndex(idx)}
                       >
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                          <circle cx="8.5" cy="8.5" r="1.5"/>
-                          <polyline points="21 15 16 10 5 21"/>
-                        </svg>
+                        {idx === 0 && PRODUCT_PHOTOS[currentProduct.id]
+                          ? <img src={PRODUCT_PHOTOS[currentProduct.id]} alt="" />
+                          : <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                              <circle cx="8.5" cy="8.5" r="1.5"/>
+                              <polyline points="21 15 16 10 5 21"/>
+                            </svg>
+                        }
                       </div>
                     ))}
                   </div>
 
                   <div className="mainImageWrapper">
-                    {/* FIX #2: STATUS_DISPLAY lookup */}
                     <div className={`mainImageBadge ${STATUS_DISPLAY[currentProduct.status]?.cls}`}>
                       {STATUS_DISPLAY[currentProduct.status]?.text}
                     </div>
                     <div className="mainImageContainer">
-                      <svg className="placeholder-img-icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
-                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                        <circle cx="8.5" cy="8.5" r="1.5"/>
-                        <polyline points="21 15 16 10 5 21"/>
-                      </svg>
+                      {PRODUCT_PHOTOS[currentProduct.id]
+                        ? <img
+                            src={PRODUCT_PHOTOS[currentProduct.id]}
+                            alt={`${currentProduct.brand} ${currentProduct.name}`}
+                            className="mainImage"
+                          />
+                        : <svg className="placeholder-img-icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                            <circle cx="8.5" cy="8.5" r="1.5"/>
+                            <polyline points="21 15 16 10 5 21"/>
+                          </svg>
+                      }
                     </div>
                   </div>
                 </div>
