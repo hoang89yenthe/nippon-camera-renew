@@ -1244,6 +1244,9 @@ export default function App() {
   const [editMode, setEditMode] = useState(false);
   const [editDraft, setEditDraft] = useState(null);
 
+  // Delete product state
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+
   // FIX #5 & #8: Refs instead of DOM queries
   const toastTimerRef = useRef(null);
   const importFileRef = useRef(null);
@@ -1451,6 +1454,22 @@ export default function App() {
     showToast(`Đã cập nhật thông tin máy ${updated.name} thành công!`);
     setEditMode(false);
     setEditDraft(null);
+  };
+
+  const handleDeleteProduct = () => {
+    const { brand, name, serial, location } = currentProduct;
+    setProducts(prev => prev.filter(p => p.id !== currentProduct.id));
+    addLog(
+      LOG_TYPE.SYSTEM,
+      'Hệ thống',
+      location,
+      `${brand} ${name}`,
+      serial,
+      `Đã xoá sản phẩm ${brand} ${name} (Serial: ${serial}) khỏi hệ thống.`
+    );
+    showToast(`Đã xoá máy ${name} khỏi hệ thống!`);
+    setDeleteModalOpen(false);
+    setCurrentProduct(null);
   };
 
   // FIX #6: Save full staff name — was incorrectly trimming to last word only
@@ -1972,6 +1991,9 @@ export default function App() {
                   )}
                   <button className="actionBtn btnEdit" onClick={handleEnterEdit}>
                     CHỈNH SỬA THÔNG TIN
+                  </button>
+                  <button className="actionBtn btnDelete" onClick={() => setDeleteModalOpen(true)}>
+                    XOÁ SẢN PHẨM
                   </button>
                 </div>
               </div>
@@ -2580,6 +2602,40 @@ export default function App() {
                 XÁC NHẬN ĐÃ BÁN
               </button>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* DELETE CONFIRMATION MODAL */}
+      {deleteModalOpen && currentProduct && (
+        <div className="modalOverlay" id="delete-modal">
+          <div className="modalBox deleteModalBox">
+            <button className="modalCloseBtn" onClick={() => setDeleteModalOpen(false)}>✕</button>
+
+            <div className="deleteModalIcon">
+              <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" strokeWidth="1.8">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                <path d="M10 11v6M14 11v6"/>
+                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+              </svg>
+            </div>
+
+            <h3 className="deleteModalTitle">Xác nhận xoá sản phẩm</h3>
+            <p className="deleteModalDesc">
+              Bạn sắp xoá <strong>{currentProduct.brand} {currentProduct.name}</strong>
+              {' '}(Serial: {currentProduct.serial}) khỏi hệ thống.
+              <br/>Hành động này không thể hoàn tác.
+            </p>
+
+            <div className="deleteModalActions">
+              <button className="cancelEditBtn" onClick={() => setDeleteModalOpen(false)}>
+                HỦY
+              </button>
+              <button className="modalSubmitBtn btnDeleteConfirm" onClick={handleDeleteProduct}>
+                XOÁ
+              </button>
+            </div>
           </div>
         </div>
       )}

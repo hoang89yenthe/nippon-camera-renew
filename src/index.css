@@ -1701,3 +1701,65 @@ body {
   flex: 2;
   margin-top: 0;
 }
+
+.btnDelete {
+  background-color: transparent;
+  border: 1.5px solid var(--status-ban-text);
+  color: var(--status-ban-text);
+  margin-top: 4px;
+}
+
+.btnDelete:hover {
+  background-color: var(--status-ban-text);
+  color: #ffffff;
+}
+
+/* Delete confirmation modal */
+.deleteModalBox {
+  text-align: center;
+}
+
+.deleteModalIcon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background-color: var(--status-ban-bg);
+  color: var(--status-ban-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 12px auto 20px;
+}
+
+.deleteModalTitle {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--brand-dark);
+  margin: 0 0 12px;
+}
+
+.deleteModalDesc {
+  font-size: 14px;
+  color: var(--text-secondary-light);
+  line-height: 1.6;
+  margin: 0 0 24px;
+}
+
+.deleteModalActions {
+  display: flex;
+  gap: 12px;
+}
+
+.deleteModalActions .cancelEditBtn {
+  flex: 1;
+}
+
+.btnDeleteConfirm {
+  flex: 1;
+  background-color: var(--status-ban-text);
+}
+
+.btnDeleteConfirm:hover {
+  background-color: #c0392b;
+}
