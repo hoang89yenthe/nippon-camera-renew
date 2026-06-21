@@ -394,7 +394,7 @@ body {
   display: flex;
   gap: 20px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
   box-shadow: var(--shadow-sm);
 }
 
@@ -402,6 +402,13 @@ body {
   transform: translateY(-4px);
   box-shadow: var(--shadow-md);
   border-color: #b0b4bd;
+  background-color: #f9fafb; /* subtle light highlight on hover */
+}
+
+/* Focus-visible for keyboard navigation */
+.productCard:focus-visible {
+  outline: 2px solid var(--brand-red);
+  outline-offset: 2px;
 }
 
 .productCardImage {
