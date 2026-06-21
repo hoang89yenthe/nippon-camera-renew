@@ -1283,6 +1283,7 @@ export default function App() {
   const [fBrand, setFBrand] = useState('FUJI');
   const [fName, setFName] = useState('');
   const [fColor, setFColor] = useState('#000000');
+  const [fColorName, setFColorName] = useState('Black');
   const [fPrice, setFPrice] = useState('');
   const [fSerial, setFSerial] = useState('');
   const [fShot, setFShot] = useState('');
@@ -1323,6 +1324,7 @@ export default function App() {
   // Delete product state
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [releaseConfirmOpen, setReleaseConfirmOpen] = useState(false);
+  const [mReleaseStaff, setMReleaseStaff] = useState(STAFFS[0]);
 
   // FIX #5 & #8: Refs instead of DOM queries
   const toastTimerRef = useRef(null);
@@ -1584,6 +1586,7 @@ export default function App() {
     if (!currentProduct) return;
 
     const prevStatus = currentProduct.status;
+    const actionLabel = prevStatus === PRODUCT_STATUS.DEPOSITED ? 'Hủy cọc' : 'Reset về còn hàng';
     // eslint-disable-next-line no-unused-vars
     const { depositInfo: _d, sellInfo: _s, ...rest } = currentProduct;
     const released = { ...rest, status: PRODUCT_STATUS.IN_STOCK };
@@ -1593,11 +1596,11 @@ export default function App() {
 
     addLog(
       LOG_TYPE.SYSTEM,
-      'Hệ thống',
+      mReleaseStaff,
       currentProduct.location,
       `${currentProduct.brand} ${currentProduct.name}`,
       currentProduct.serial,
-      `Reset trạng thái từ ${prevStatus === PRODUCT_STATUS.DEPOSITED ? 'Đã cọc' : 'Đã bán'} về Còn hàng`
+      `${actionLabel} máy ${currentProduct.brand} ${currentProduct.name} (Serial: ${currentProduct.serial}) bởi ${mReleaseStaff}.`
     );
 
     showToast(`Đã giải phóng máy ${currentProduct.name} về trạng thái Còn hàng!`);
@@ -1700,7 +1703,7 @@ export default function App() {
       id: newId,
       brand: fBrand,
       name: fName,
-      specs: `${fColor === '#000000' ? 'Black' : 'Color'}, ${fLensName ? `Kit (${fLensName})` : 'Body'}, ${fBox ? 'Fullbox' : 'No box'} / ${newId}`,
+      specs: `${fColorName.trim() || 'Black'}, ${fLensName ? `Kit (${fLensName})` : 'Body'}, ${fBox ? 'Fullbox' : 'No box'} / ${newId}`,
       price: parsedPrice,
       status: PRODUCT_STATUS.IN_STOCK,
       color: fColor,
@@ -1745,6 +1748,8 @@ export default function App() {
     setFDesc('');
     setFBox(false);
     setFLensName('');
+    setFColor('#000000');
+    setFColorName('Black');
 
     setIsUploading(false);
     setCurrentBrand(fBrand);
@@ -3069,10 +3074,24 @@ export default function App() {
                     <input
                       type="color"
                       value={fColor}
-                      onChange={e => setFColor(e.target.value)}
+                      onChange={e => {
+                        setFColor(e.target.value);
+                        if (e.target.value === '#000000') setFColorName('Black');
+                        else if (e.target.value === '#c0c0c0' || e.target.value === '#c0c0c1') setFColorName('Silver');
+                        else if (e.target.value === '#ffffff') setFColorName('White');
+                        else if (e.target.value === '#3a3a3a') setFColorName('Dark Grey');
+                      }}
                       className="colorCircleInput"
                     />
                   </label>
+                  <input
+                    className="entryInput"
+                    type="text"
+                    placeholder="Tên màu (Black, Silver...)"
+                    value={fColorName}
+                    onChange={e => setFColorName(e.target.value)}
+                    style={{ flex: 1 }}
+                  />
                   <span className="entryInlineLabel">Serial</span>
                   <input
                     className="entryInput entryInputSmall"
@@ -3856,8 +3875,17 @@ export default function App() {
                 ? <>Bạn sắp <strong>hủy cọc</strong> máy <strong>{currentProduct.brand} {currentProduct.name}</strong>. Thông tin cọc sẽ bị xóa và máy trở về trạng thái <strong>Còn hàng</strong>.</>
                 : <>Bạn sắp <strong>reset</strong> máy <strong>{currentProduct.brand} {currentProduct.name}</strong> từ Đã bán về <strong>Còn hàng</strong>. Thông tin bán sẽ bị xóa.</>
               }
-              <br/>Hành động này không thể hoàn tác.
             </p>
+            <div className="modalFieldGroup" style={{ margin: '12px 0' }}>
+              <label style={{ fontWeight: 700, fontSize: 14, whiteSpace: 'nowrap' }}>Người thực hiện:</label>
+              <select
+                value={mReleaseStaff}
+                onChange={e => setMReleaseStaff(e.target.value)}
+                style={{ flex: 1, height: 36, borderRadius: 8, border: '1px solid var(--border-light)', padding: '0 12px', fontFamily: 'inherit', fontSize: 13 }}
+              >
+                {STAFFS.map(s => <option key={s} value={s}>{s}</option>)}
+              </select>
+            </div>
             <div className="deleteModalActions">
               <button className="cancelEditBtn" onClick={() => setReleaseConfirmOpen(false)}>HỦY</button>
               <button
