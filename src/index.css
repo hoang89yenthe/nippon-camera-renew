@@ -544,6 +544,50 @@ body {
 .statusFilterBtn.active.status-coc { background-color: var(--status-coc-text); }
 .statusFilterBtn.active.status-ban { background-color: var(--status-ban-text); }
 
+.statusFilterCount {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  margin-left: 4px;
+  border-radius: 9px;
+  background-color: rgba(0, 0, 0, 0.08);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.statusFilterBtn.active .statusFilterCount {
+  background-color: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
+
+/* ── INVENTORY SUMMARY LINE ── */
+.inventorySummary {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: -8px 0 22px;
+  padding: 10px 16px;
+  background-color: #f0f9f4;
+  border: 1px solid #c8ecd6;
+  border-radius: 10px;
+  font-size: 14px;
+  color: var(--text-secondary-light);
+}
+
+.inventorySummaryItem strong {
+  color: var(--brand-dark);
+  font-weight: 700;
+}
+
+.inventorySummaryDot {
+  color: #b0b4bd;
+}
+
 /* ── GLOBAL SEARCH RESULTS (brand grid → search mode) ── */
 .globalSearchHeading {
   font-family: var(--font-heading);

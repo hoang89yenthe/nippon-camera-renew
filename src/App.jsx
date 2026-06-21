@@ -2165,7 +2165,8 @@ export default function App() {
   };
 
   // FIX #4: useMemo — filter + pagination only recomputes when relevant state changes
-  const filteredProducts = useMemo(() => {
+  // Brand + search + price filtered (everything except status) — basis for counts
+  const brandScopedProducts = useMemo(() => {
     let result = products;
 
     if (currentBrand) {
@@ -2186,12 +2187,32 @@ export default function App() {
     } else if (priceFilter === 'tren-30') {
       result = result.filter(p => p.price > 30000000);
     }
-    if (statusFilter) {
-      result = result.filter(p => p.status === statusFilter);
-    }
 
     return result;
-  }, [products, currentBrand, searchQuery, priceFilter, statusFilter]);
+  }, [products, currentBrand, searchQuery, priceFilter]);
+
+  const filteredProducts = useMemo(() => {
+    if (!statusFilter) return brandScopedProducts;
+    return brandScopedProducts.filter(p => p.status === statusFilter);
+  }, [brandScopedProducts, statusFilter]);
+
+  // Counts per status for the current brand scope (drives the filter pills)
+  const statusCounts = useMemo(() => {
+    const counts = {
+      all: brandScopedProducts.length,
+      [PRODUCT_STATUS.IN_STOCK]: 0,
+      [PRODUCT_STATUS.DEPOSITED]: 0,
+      [PRODUCT_STATUS.SOLD]: 0,
+    };
+    let depositTotal = 0;
+    brandScopedProducts.forEach(p => {
+      counts[p.status] = (counts[p.status] || 0) + 1;
+      if (p.status === PRODUCT_STATUS.DEPOSITED) {
+        depositTotal += p.depositInfo?.amount || 0;
+      }
+    });
+    return { ...counts, depositTotal };
+  }, [brandScopedProducts]);
 
   // Global search across all brands (used when on brand grid with a search query)
   const globalSearchResults = useMemo(() => {
@@ -2416,22 +2437,40 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Status filter pills */}
+              {/* Status filter pills with live counts */}
               <div className="statusFilterBar">
                 {[
-                  { value: '',                          label: 'Tất cả' },
-                  { value: PRODUCT_STATUS.IN_STOCK,     label: 'Còn hàng' },
-                  { value: PRODUCT_STATUS.DEPOSITED,    label: 'Đã cọc' },
-                  { value: PRODUCT_STATUS.SOLD,         label: 'Đã bán' },
-                ].map(({ value, label }) => (
+                  { value: '',                          label: 'Tất cả',   count: statusCounts.all },
+                  { value: PRODUCT_STATUS.IN_STOCK,     label: 'Còn hàng', count: statusCounts[PRODUCT_STATUS.IN_STOCK] },
+                  { value: PRODUCT_STATUS.DEPOSITED,    label: 'Đã cọc',   count: statusCounts[PRODUCT_STATUS.DEPOSITED] },
+                  { value: PRODUCT_STATUS.SOLD,         label: 'Đã bán',   count: statusCounts[PRODUCT_STATUS.SOLD] },
+                ].map(({ value, label, count }) => (
                   <button
                     key={value}
                     className={`statusFilterBtn ${statusFilter === value ? 'active' : ''} ${value ? STATUS_DISPLAY[value]?.cls : ''}`}
                     onClick={() => { setStatusFilter(value); setCurrentPage(1); }}
                   >
-                    {label}
+                    {label} <span className="statusFilterCount">{count}</span>
                   </button>
                 ))}
+              </div>
+
+              {/* Inventory summary: how much stock left, how much deposited */}
+              <div className="inventorySummary">
+                <span className="inventorySummaryItem">
+                  Còn <strong>{statusCounts[PRODUCT_STATUS.IN_STOCK]}</strong> máy có thể bán
+                </span>
+                {statusCounts[PRODUCT_STATUS.DEPOSITED] > 0 && (
+                  <>
+                    <span className="inventorySummaryDot">•</span>
+                    <span className="inventorySummaryItem">
+                      <strong>{statusCounts[PRODUCT_STATUS.DEPOSITED]}</strong> máy khách đang giữ cọc
+                      {statusCounts.depositTotal > 0 && (
+                        <> (tổng cọc <strong>{formatMoney(statusCounts.depositTotal)}</strong>)</>
+                      )}
+                    </span>
+                  </>
+                )}
               </div>
 
               {pagedProducts.length === 0 ? (
