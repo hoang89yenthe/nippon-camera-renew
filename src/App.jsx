@@ -1262,6 +1262,7 @@ export default function App() {
   const [priceFilter, setPriceFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [collapsedGroups, setCollapsedGroups] = useState(new Set());
   const [activeThumbIndex, setActiveThumbIndex] = useState(0);
 
   // Modals state
@@ -2191,9 +2192,28 @@ export default function App() {
     return result;
   }, [products, currentBrand, searchQuery, priceFilter]);
 
-  const filteredProducts = useMemo(() => {
-    if (!statusFilter) return brandScopedProducts;
-    return brandScopedProducts.filter(p => p.status === statusFilter);
+  // Group products by model name. Each used camera stays its own record
+  // (unique serial / condition / price), but the list rolls them up so staff
+  // see "X-M5 — 3 máy: 2 còn hàng · 1 đã cọc". Single-unit models stay flat.
+  const groupedProducts = useMemo(() => {
+    const map = new Map();
+    brandScopedProducts.forEach(p => {
+      if (!map.has(p.name)) map.set(p.name, []);
+      map.get(p.name).push(p);
+    });
+    const groups = [];
+    map.forEach((items, name) => {
+      const counts = {
+        [PRODUCT_STATUS.IN_STOCK]:  items.filter(p => p.status === PRODUCT_STATUS.IN_STOCK).length,
+        [PRODUCT_STATUS.DEPOSITED]: items.filter(p => p.status === PRODUCT_STATUS.DEPOSITED).length,
+        [PRODUCT_STATUS.SOLD]:      items.filter(p => p.status === PRODUCT_STATUS.SOLD).length,
+      };
+      // status filter narrows which units show, but the header keeps full counts
+      const visibleItems = statusFilter ? items.filter(p => p.status === statusFilter) : items;
+      if (visibleItems.length === 0) return;
+      groups.push({ name, items: visibleItems, counts, total: items.length });
+    });
+    return groups;
   }, [brandScopedProducts, statusFilter]);
 
   // Counts per status for the current brand scope (drives the filter pills)
@@ -2227,14 +2247,114 @@ export default function App() {
 
   const itemsPerPage = 6;
 
-  const { totalPages, pagedProducts } = useMemo(() => {
-    const total = Math.ceil(filteredProducts.length / itemsPerPage);
+  // Paginate by group (model), not by individual unit
+  const { totalPages, pagedGroups } = useMemo(() => {
+    const total = Math.ceil(groupedProducts.length / itemsPerPage);
     const start = (currentPage - 1) * itemsPerPage;
     return {
       totalPages: total,
-      pagedProducts: filteredProducts.slice(start, start + itemsPerPage),
+      pagedGroups: groupedProducts.slice(start, start + itemsPerPage),
     };
-  }, [filteredProducts, currentPage]);
+  }, [groupedProducts, currentPage]);
+
+  const toggleGroupCollapse = (name) => {
+    setCollapsedGroups(prev => {
+      const next = new Set(prev);
+      if (next.has(name)) next.delete(name); else next.add(name);
+      return next;
+    });
+  };
+
+  // Single product card — shared by flat single-unit models and grouped units
+  const renderProductCard = (p) => {
+    const { text: statusText, cls: statusClass } = STATUS_DISPLAY[p.status] ?? STATUS_DISPLAY[PRODUCT_STATUS.IN_STOCK];
+    return (
+      <div
+        key={p.id}
+        className="productCard"
+        onClick={() => { setCurrentProduct(p); setActiveThumbIndex(0); }}
+      >
+        <div className="productCardImage">
+          {getProductPhoto(p.id) && !failedImages.has(p.id)
+            ? <img
+                src={getProductPhoto(p.id)}
+                alt={p.name}
+                className="productCardImg"
+                loading="lazy"
+                referrerPolicy="no-referrer"
+                onError={() => setFailedImages(prev => new Set([...prev, p.id]))}
+              />
+            : <svg className="placeholder-img-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                <circle cx="8.5" cy="8.5" r="1.5"/>
+                <polyline points="21 15 16 10 5 21"/>
+              </svg>
+          }
+        </div>
+        <div className="productCardInfo">
+          <div className={`productCardStatus ${statusClass}`}>{statusText}</div>
+          <h3 className="productCardTitle">{p.name}</h3>
+          <p className="productCardSpecs">{p.specs.split(' / ')[0]}</p>
+          <p className="productCardId">SKU: {p.id}</p>
+          <div className="productCardPrice">{formatMoneyRaw(p.price)}</div>
+        </div>
+      </div>
+    );
+  };
+
+  // Render grouped list: consecutive single-unit models batch into one grid
+  // (preserves the 2-col look); multi-unit models get a full-width group block.
+  const renderGroupedList = () => {
+    const blocks = [];
+    let singleBatch = [];
+    const flushSingles = () => {
+      if (singleBatch.length) {
+        blocks.push(
+          <div className="productGrid" key={`singles-${blocks.length}`}>
+            {singleBatch.map(renderProductCard)}
+          </div>
+        );
+        singleBatch = [];
+      }
+    };
+    pagedGroups.forEach(g => {
+      if (g.total === 1) {
+        singleBatch.push(g.items[0]);
+        return;
+      }
+      flushSingles();
+      const collapsed = collapsedGroups.has(g.name);
+      blocks.push(
+        <div className="modelGroup" key={g.name}>
+          <div className="modelGroupHeader" onClick={() => toggleGroupCollapse(g.name)}>
+            <div className="modelGroupTitleWrap">
+              <h3 className="modelGroupTitle">{g.name}</h3>
+              <span className="modelGroupTotal">{g.total} máy</span>
+            </div>
+            <div className="modelGroupBreakdown">
+              {g.counts[PRODUCT_STATUS.IN_STOCK] > 0 && (
+                <span className="mgb mgb-con">{g.counts[PRODUCT_STATUS.IN_STOCK]} còn hàng</span>
+              )}
+              {g.counts[PRODUCT_STATUS.DEPOSITED] > 0 && (
+                <span className="mgb mgb-coc">{g.counts[PRODUCT_STATUS.DEPOSITED]} đã cọc</span>
+              )}
+              {g.counts[PRODUCT_STATUS.SOLD] > 0 && (
+                <span className="mgb mgb-ban">{g.counts[PRODUCT_STATUS.SOLD]} đã bán</span>
+              )}
+              <span className="modelGroupToggle">{collapsed ? '▼' : '▲'}</span>
+            </div>
+          </div>
+          {!collapsed && (
+            <div className="productGrid modelGroupGrid">
+              {g.items.map(renderProductCard)}
+            </div>
+          )}
+        </div>
+      );
+    });
+    flushSingles();
+    return blocks;
+  };
 
   // ════════════════════════════════════════════════════
   // 4. RENDERING JSX SUB-VIEWS
@@ -2473,52 +2593,13 @@ export default function App() {
                 )}
               </div>
 
-              {pagedProducts.length === 0 ? (
+              {groupedProducts.length === 0 ? (
                 <div className="noProducts">
                   <p>Không tìm thấy sản phẩm cũ nào phù hợp.</p>
                 </div>
               ) : (
-                <div className="productGrid">
-                  {/* FIX #2: STATUS_DISPLAY lookup replaces repeated if-else chains */}
-                  {pagedProducts.map(p => {
-                    const { text: statusText, cls: statusClass } = STATUS_DISPLAY[p.status] ?? STATUS_DISPLAY[PRODUCT_STATUS.IN_STOCK];
-
-                    return (
-                      <div
-                        key={p.id}
-                        className="productCard"
-                        onClick={() => {
-                          setCurrentProduct(p);
-                          setActiveThumbIndex(0);
-                        }}
-                      >
-                        <div className="productCardImage">
-                          {getProductPhoto(p.id) && !failedImages.has(p.id)
-                            ? <img
-                                src={getProductPhoto(p.id)}
-                                alt={p.name}
-                                className="productCardImg"
-                                loading="lazy"
-                                referrerPolicy="no-referrer"
-                                onError={() => setFailedImages(prev => new Set([...prev, p.id]))}
-                              />
-                            : <svg className="placeholder-img-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                                <circle cx="8.5" cy="8.5" r="1.5"/>
-                                <polyline points="21 15 16 10 5 21"/>
-                              </svg>
-                          }
-                        </div>
-                        <div className="productCardInfo">
-                          <div className={`productCardStatus ${statusClass}`}>{statusText}</div>
-                          <h3 className="productCardTitle">{p.name}</h3>
-                          <p className="productCardSpecs">{p.specs.split(' / ')[0]}</p>
-                          <p className="productCardId">SKU: {p.id}</p>
-                          <div className="productCardPrice">{formatMoneyRaw(p.price)}</div>
-                        </div>
-                      </div>
-                    );
-                  })}
+                <div className="productListGrouped">
+                  {renderGroupedList()}
                 </div>
               )}
 

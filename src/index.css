@@ -588,6 +588,96 @@ body {
   color: #b0b4bd;
 }
 
+/* ── MODEL GROUPING (list rolls up units by model) ── */
+.productListGrouped {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 32px;
+}
+
+.productListGrouped > .productGrid {
+  margin-bottom: 0;
+}
+
+.modelGroup {
+  border: 1px solid var(--border-light);
+  border-radius: 14px;
+  background-color: #fafbfc;
+  padding: 6px;
+}
+
+.modelGroupHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  cursor: pointer;
+  user-select: none;
+  flex-wrap: wrap;
+}
+
+.modelGroupTitleWrap {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.modelGroupTitle {
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--brand-dark);
+  margin: 0;
+}
+
+.modelGroupTotal {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-secondary-light);
+  background-color: rgba(0, 0, 0, 0.05);
+  padding: 2px 10px;
+  border-radius: 12px;
+}
+
+.modelGroupBreakdown {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.mgb {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 12px;
+}
+
+.mgb-con { background-color: var(--status-con-bg); color: var(--status-con-text); }
+.mgb-coc { background-color: var(--status-coc-bg); color: var(--status-coc-text); }
+.mgb-ban { background-color: var(--status-ban-bg); color: var(--status-ban-text); }
+
+.modelGroupToggle {
+  font-size: 11px;
+  color: #909399;
+  margin-left: 2px;
+}
+
+.modelGroupGrid {
+  padding: 0 8px 8px;
+}
+
+@media (max-width: 700px) {
+  .modelGroupHeader {
+    gap: 8px;
+  }
+  .modelGroupTitle {
+    font-size: 16px;
+  }
+}
+
 /* ── GLOBAL SEARCH RESULTS (brand grid → search mode) ── */
 .globalSearchHeading {
   font-family: var(--font-heading);
