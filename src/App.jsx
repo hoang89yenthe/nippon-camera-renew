@@ -68,6 +68,52 @@ const INITIAL_PRODUCTS = [
     dateAdded: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString()
   },
   {
+    id: '37496',
+    brand: 'FUJI',
+    name: 'X-M5',
+    specs: 'Silver, Body, Fullbox / 37496',
+    price: 22900000,
+    status: PRODUCT_STATUS.IN_STOCK,
+    color: '#c0c0c0',
+    box: true,
+    lens: false,
+    serial: '41902',
+    shotCount: '1.200',
+    accessories: 'Fullbox, sạc zin, 2 pin, dây đeo',
+    location: '193 Giảng Võ',
+    staff: 'Lê Hồng Quân',
+    condition: 99,
+    description: 'Bản bạc đẹp keng, lướt nhẹ số shot thấp, fullbox đầy đủ phụ kiện.',
+    dateAdded: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString()
+  },
+  {
+    id: '37497',
+    brand: 'FUJI',
+    name: 'X-M5',
+    specs: 'Black, Body, No box / 37497',
+    price: 20500000,
+    status: PRODUCT_STATUS.DEPOSITED,
+    color: '#000000',
+    box: false,
+    lens: false,
+    serial: '38771',
+    shotCount: '8.900',
+    accessories: 'Sạc, 1 pin zin',
+    location: '74 Bà Triệu',
+    staff: 'Trần Văn Nam',
+    condition: 95,
+    description: 'Máy hoạt động tốt, xước dăm nhẹ ở báng cầm, giá mềm.',
+    dateAdded: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
+    depositInfo: {
+      staff: 'Trần Văn Nam',
+      location: '74 Bà Triệu',
+      date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+      customerName: 'Anh Tuấn',
+      customerPhone: '0901234567',
+      amount: 3000000
+    }
+  },
+  {
     id: '37491',
     brand: 'FUJI',
     name: 'X-T5',
@@ -180,6 +226,25 @@ const INITIAL_PRODUCTS = [
     condition: 98,
     description: 'Máy đẹp keng không tì vết, hoạt động hoàn hảo.',
     dateAdded: new Date().toISOString()
+  },
+  {
+    id: '38491',
+    brand: 'SONY',
+    name: 'A7 IV',
+    specs: 'Black, Body, No box / 38491',
+    price: 39900000,
+    status: PRODUCT_STATUS.IN_STOCK,
+    color: '#000000',
+    box: false,
+    lens: false,
+    serial: '66537',
+    shotCount: '18.500',
+    accessories: 'Sạc, 2 pin zin, dây đeo',
+    location: '193 NBK',
+    staff: 'Nguyễn Việt Thịnh',
+    condition: 94,
+    description: 'Máy đã qua sử dụng nhiều, số shot cao nhưng hoạt động ổn định, giá tốt.',
+    dateAdded: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString()
   },
   {
     id: '39490',
@@ -841,6 +906,8 @@ const INITIAL_PRODUCTS = [
 const PRODUCT_PHOTOS = {
   // FUJI
   '37490': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Fujifilm_X-M5_-_1.jpg/600px-Fujifilm_X-M5_-_1.jpg',
+  '37496': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Fujifilm_X-M5_-_1.jpg/600px-Fujifilm_X-M5_-_1.jpg',
+  '37497': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Fujifilm_X-M5_-_1.jpg/600px-Fujifilm_X-M5_-_1.jpg',
   '37491': 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Fujifilm_X-T5_4_nov_2022a.jpg/600px-Fujifilm_X-T5_4_nov_2022a.jpg',
   '37492': 'https://fujifilm-x.b-cdn.net/wp-content/uploads/2021/09/x-t30-ii_thum_bxyg.jpg',
   '37493': 'https://fujifilm-x.b-cdn.net/wp-content/uploads/2023/05/dwga_x-s20_thum.jpg',
@@ -850,6 +917,7 @@ const PRODUCT_PHOTOS = {
   '65490': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Fujifilm_GFX50S_II_10_nov_2021a.jpg/600px-Fujifilm_GFX50S_II_10_nov_2021a.jpg',
   // SONY
   '38490': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Sony_A7_IV_%28ILCE-7M4%29_-_by_Henry_S%C3%B6derlund_%2851739988735%29.jpg/600px-Sony_A7_IV_%28ILCE-7M4%29_-_by_Henry_S%C3%B6derlund_%2851739988735%29.jpg',
+  '38491': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Sony_A7_IV_%28ILCE-7M4%29_-_by_Henry_S%C3%B6derlund_%2851739988735%29.jpg/600px-Sony_A7_IV_%28ILCE-7M4%29_-_by_Henry_S%C3%B6derlund_%2851739988735%29.jpg',
   '49490': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Sony_ILCE-7CM2_8_nov_2023a.jpg/600px-Sony_ILCE-7CM2_8_nov_2023a.jpg',
   '50490': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Sony_ZV-E10_with_Sony_E_16-50mm_F3.5-5.6_OSS_PZ_-_by_Henry_S%C3%B6derlund_%2851375243603%29.jpg/600px-Sony_ZV-E10_with_Sony_E_16-50mm_F3.5-5.6_OSS_PZ_-_by_Henry_S%C3%B6derlund_%2851375243603%29.jpg',
   '51490': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Sony_FX30_with_Sony_E_10-20mm_F4_PZ_G_-_by_Henry_S%C3%B6derlund_%2852445895581%29.jpg/600px-Sony_FX30_with_Sony_E_10-20mm_F4_PZ_G_-_by_Henry_S%C3%B6derlund_%2852445895581%29.jpg',
@@ -2504,14 +2572,15 @@ export default function App() {
             ) : (
               <div className="brandGrid" id="brand-grid">
                 {Object.keys(BRAND_SLOGANS).map(b => (
-                  <button
-                    key={b}
-                    className={`brandCard ${b === 'FUJI' ? 'highlight-brand' : ''}`}
-                    onClick={() => handleBrandSelect(b)}
-                  >
-                    {b}
-                  </button>
-                ))}
+        <button
+          key={b}
+          className="brandCard"
+          onClick={() => handleBrandSelect(b)}
+        >
+          {b}
+        </button>
+      ))}
+
               </div>
             )
           )}
