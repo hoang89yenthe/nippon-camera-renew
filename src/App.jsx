@@ -1288,6 +1288,7 @@ export default function App() {
   const [fDesc, setFDesc] = useState('');
   const [fImages, setFImages] = useState([]);
   const [isDragging, setIsDragging] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
 
   const [productImages, setProductImages] = useState(() => {
@@ -1308,20 +1309,35 @@ export default function App() {
 
   // Delete product state
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [releaseConfirmOpen, setReleaseConfirmOpen] = useState(false);
 
   // FIX #5 & #8: Refs instead of DOM queries
   const toastTimerRef = useRef(null);
   const importFileRef = useRef(null);
   const imageInputRef = useRef(null);
 
-  // Sync to local storage
+  // Sync to local storage (with quota guard)
+  const safeLocalStorageSet = (key, value) => {
+    try {
+      localStorage.setItem(key, value);
+    } catch (e) {
+      if (e?.name === 'QuotaExceededError' || e?.code === 22) {
+        showToast('Bộ nhớ thiết bị đã đầy! Hãy xuất JSON backup và xoá bớt dữ liệu.', 'error');
+      }
+    }
+  };
+
   useEffect(() => {
-    localStorage.setItem('nippon_camera_products', JSON.stringify(products));
+    safeLocalStorageSet('nippon_camera_products', JSON.stringify(products));
   }, [products]);
 
   useEffect(() => {
-    localStorage.setItem('nippon_camera_history', JSON.stringify(history));
+    safeLocalStorageSet('nippon_camera_history', JSON.stringify(history));
   }, [history]);
+
+  useEffect(() => {
+    safeLocalStorageSet('nippon_camera_images', JSON.stringify(productImages));
+  }, [productImages]);
 
   // FIX #5: Clear toast timer on unmount to prevent memory leak
   useEffect(() => {
@@ -1496,11 +1512,18 @@ export default function App() {
 
     const sellInfo = { staff: mSellStaff, location: mSellLocation, date: new Date().toISOString() };
 
-    setProducts(prev => prev.map(p =>
-      p.id === currentProduct.id ? { ...p, status: PRODUCT_STATUS.SOLD, sellInfo } : p
-    ));
+    setProducts(prev => prev.map(p => {
+      if (p.id !== currentProduct.id) return p;
+      // eslint-disable-next-line no-unused-vars
+      const { depositInfo: _d, ...rest } = p;
+      return { ...rest, status: PRODUCT_STATUS.SOLD, sellInfo };
+    }));
 
-    setCurrentProduct(prev => ({ ...prev, status: PRODUCT_STATUS.SOLD, sellInfo }));
+    setCurrentProduct(prev => {
+      // eslint-disable-next-line no-unused-vars
+      const { depositInfo: _d, ...rest } = prev;
+      return { ...rest, status: PRODUCT_STATUS.SOLD, sellInfo };
+    });
 
     addLog(
       LOG_TYPE.SELL,
@@ -1593,13 +1616,20 @@ export default function App() {
 
   const handleAddProduct = async (e) => {
     e.preventDefault();
+    if (isUploading) return;
+    const parsedPrice = parseInt(fPrice, 10);
+    if (!parsedPrice || parsedPrice <= 0) {
+      showToast('Giá bán phải là số dương hợp lệ!', 'error');
+      return;
+    }
+    setIsUploading(true);
     const newId = 'sku_' + Date.now();
     const newProduct = {
       id: newId,
       brand: fBrand,
       name: fName,
       specs: `${fColor === '#000000' ? 'Black' : 'Color'}, ${fLensName ? `Kit (${fLensName})` : 'Body'}, ${fBox ? 'Fullbox' : 'No box'} / ${newId}`,
-      price: parseInt(fPrice, 10),
+      price: parsedPrice,
       status: PRODUCT_STATUS.IN_STOCK,
       color: fColor,
       box: fBox,
@@ -1619,7 +1649,6 @@ export default function App() {
       const compressed = await Promise.all(fImages.map(img => compressImageFile(img.file)));
       const updatedImages = { ...productImages, [newId]: compressed };
       setProductImages(updatedImages);
-      localStorage.setItem('nippon_camera_images', JSON.stringify(updatedImages));
       fImages.forEach(img => URL.revokeObjectURL(img.preview));
       setFImages([]);
     }
@@ -1645,6 +1674,7 @@ export default function App() {
     setFBox(false);
     setFLensName('');
 
+    setIsUploading(false);
     setCurrentBrand(fBrand);
     setCurrentProduct(null);
     setCurrentTab('check-gia');
@@ -1934,8 +1964,10 @@ export default function App() {
           setHistory(db.history);
           if (db.images && typeof db.images === 'object') {
             setProductImages(db.images);
-            localStorage.setItem('nippon_camera_images', JSON.stringify(db.images));
           }
+          setCurrentProduct(null);
+          setCurrentBrand(null);
+          setCurrentTab('check-gia');
           showToast('Đã nhập cơ sở dữ liệu thành công!', 'success');
         } else {
           showToast('Định dạng file sao lưu không hợp lệ!', 'error');
@@ -2429,7 +2461,30 @@ export default function App() {
               <div className="galleryActions">
                 <button
                   className="downloadBtn"
-                  onClick={() => showToast(`Đã tải xuống ảnh máy ${currentProduct.name} thành công!`)}
+                  onClick={async () => {
+                    const photos = getProductPhotoList(currentProduct.id);
+                    const src = photos[activeThumbIndex];
+                    if (!src) { showToast('Không có ảnh để tải xuống!', 'error'); return; }
+                    try {
+                      let blob;
+                      if (src.startsWith('data:')) {
+                        const res = await fetch(src);
+                        blob = await res.blob();
+                      } else {
+                        const res = await fetch(src);
+                        blob = await res.blob();
+                      }
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = `${currentProduct.brand}_${currentProduct.name}_${activeThumbIndex + 1}.jpg`;
+                      a.click();
+                      URL.revokeObjectURL(url);
+                      showToast('Đã tải xuống ảnh thành công!');
+                    } catch {
+                      showToast('Không thể tải ảnh này (ảnh ngoài có thể bị chặn CORS)!', 'error');
+                    }
+                  }}
                 >
                   <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
@@ -2470,14 +2525,14 @@ export default function App() {
                       <button className="actionBtn btnBan" onClick={() => setSellModalOpen(true)}>
                         BÁN NGAY
                       </button>
-                      <button className="actionBtn btnRelease" onClick={handleReleaseProduct}>
+                      <button className="actionBtn btnRelease" onClick={() => setReleaseConfirmOpen(true)}>
                         HỦY CỌC (CÒN HÀNG)
                       </button>
                     </>
                   ) : (
                     <>
                       <p className="statusNotice">Sản phẩm này đã được bán thành công.</p>
-                      <button className="actionBtn btnRelease" onClick={handleReleaseProduct}>
+                      <button className="actionBtn btnRelease" onClick={() => setReleaseConfirmOpen(true)}>
                         RESET CÒN HÀNG
                       </button>
                     </>
@@ -2881,7 +2936,9 @@ export default function App() {
                   />
                 </div>
 
-                <button type="submit" className="entrySubmitBtn">NHẬP VÀO</button>
+                <button type="submit" className="entrySubmitBtn" disabled={isUploading}>
+                  {isUploading ? 'ĐANG XỬ LÝ...' : 'NHẬP VÀO'}
+                </button>
               </form>
             </div>
           </div>
@@ -3350,6 +3407,42 @@ export default function App() {
                 XÁC NHẬN ĐÃ BÁN
               </button>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* RELEASE CONFIRM MODAL (HỦY CỌC / RESET CÒN HÀNG) */}
+      {releaseConfirmOpen && currentProduct && (
+        <div className="modalOverlay">
+          <div className="modalBox deleteModalBox">
+            <button className="modalCloseBtn" onClick={() => setReleaseConfirmOpen(false)}>✕</button>
+            <div className="deleteModalIcon">
+              <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" strokeWidth="1.8">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+            </div>
+            <h3 className="deleteModalTitle">
+              {currentProduct.status === PRODUCT_STATUS.DEPOSITED ? 'Xác nhận hủy cọc' : 'Xác nhận reset còn hàng'}
+            </h3>
+            <p className="deleteModalDesc">
+              {currentProduct.status === PRODUCT_STATUS.DEPOSITED
+                ? <>Bạn sắp <strong>hủy cọc</strong> máy <strong>{currentProduct.brand} {currentProduct.name}</strong>. Thông tin cọc sẽ bị xóa và máy trở về trạng thái <strong>Còn hàng</strong>.</>
+                : <>Bạn sắp <strong>reset</strong> máy <strong>{currentProduct.brand} {currentProduct.name}</strong> từ Đã bán về <strong>Còn hàng</strong>. Thông tin bán sẽ bị xóa.</>
+              }
+              <br/>Hành động này không thể hoàn tác.
+            </p>
+            <div className="deleteModalActions">
+              <button className="cancelEditBtn" onClick={() => setReleaseConfirmOpen(false)}>HỦY</button>
+              <button
+                className="modalSubmitBtn"
+                style={{ background: 'var(--brand-dark)' }}
+                onClick={() => { handleReleaseProduct(); setReleaseConfirmOpen(false); }}
+              >
+                XÁC NHẬN
+              </button>
+            </div>
           </div>
         </div>
       )}
