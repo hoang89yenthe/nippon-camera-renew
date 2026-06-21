@@ -1267,6 +1267,9 @@ export default function App() {
   const [depositModalOpen, setDepositModalOpen] = useState(false);
   const [mDepStaff, setMDepStaff] = useState(STAFFS[0]);
   const [mDepLocation, setMDepLocation] = useState(LOCATIONS[0]);
+  const [mDepCustomerName, setMDepCustomerName] = useState('');
+  const [mDepCustomerPhone, setMDepCustomerPhone] = useState('');
+  const [mDepAmount, setMDepAmount] = useState('');
 
   const [sellModalOpen, setSellModalOpen] = useState(false);
   const [mSellStaff, setMSellStaff] = useState(STAFFS[0]);
@@ -1478,7 +1481,14 @@ export default function App() {
     e.preventDefault();
     if (!currentProduct) return;
 
-    const depositInfo = { staff: mDepStaff, location: mDepLocation, date: new Date().toISOString() };
+    const depositInfo = {
+      staff: mDepStaff,
+      location: mDepLocation,
+      date: new Date().toISOString(),
+      customerName: mDepCustomerName,
+      customerPhone: mDepCustomerPhone,
+      amount: parseInt(mDepAmount, 10)
+    };
     let updatedProduct;
 
     setProducts(prev => prev.map(p => {
@@ -1498,10 +1508,13 @@ export default function App() {
       mDepLocation,
       `${currentProduct.brand} ${currentProduct.name}`,
       currentProduct.serial,
-      `Xác nhận khách nhận cọc máy ${currentProduct.brand} ${currentProduct.name} (Serial: ${currentProduct.serial}) cho khách của ${mDepStaff} tại chi nhánh ${mDepLocation}.`
+      `Xác nhận khách nhận cọc máy ${currentProduct.brand} ${currentProduct.name} (Serial: ${currentProduct.serial}) cho khách của ${mDepStaff} tại chi nhánh ${mDepLocation}. Khách: ${mDepCustomerName} (${mDepCustomerPhone}), tiền cọc: ${parseInt(mDepAmount, 10).toLocaleString('vi-VN')}đ.`
     );
 
     showToast(`Đã nhận cọc máy ${currentProduct.name} thành công!`);
+    setMDepCustomerName('');
+    setMDepCustomerPhone('');
+    setMDepAmount('');
     setDepositModalOpen(false);
   };
 
@@ -1620,6 +1633,12 @@ export default function App() {
     const parsedPrice = parseInt(fPrice, 10);
     if (!parsedPrice || parsedPrice <= 0) {
       showToast('Giá bán phải là số dương hợp lệ!', 'error');
+      return;
+    }
+    const duplicateSerial = products.find(p => p.serial && p.serial.trim() === fSerial.trim() && fSerial.trim() !== '');
+    if (duplicateSerial) {
+      showToast(`Serial "${fSerial}" đã tồn tại! (${duplicateSerial.brand} ${duplicateSerial.name})`, 'error');
+      setIsUploading(false);
       return;
     }
     setIsUploading(true);
@@ -2397,6 +2416,34 @@ export default function App() {
                     </div>
                     <span>{currentProduct.staff}</span>
                   </div>
+
+                  {currentProduct.status === PRODUCT_STATUS.DEPOSITED && currentProduct.depositInfo && (
+                    <div className="depositInfoBlock">
+                      <div className="depositInfoTitle">Thông tin cọc</div>
+                      <div className="depositInfoRow">
+                        <span className="depositInfoLabel">Khách:</span>
+                        <span className="depositInfoValue">
+                          {currentProduct.depositInfo.customerName || '—'} — {currentProduct.depositInfo.customerPhone || '—'}
+                        </span>
+                      </div>
+                      <div className="depositInfoRow">
+                        <span className="depositInfoLabel">Tiền cọc:</span>
+                        <span className="depositInfoValue">
+                          {currentProduct.depositInfo.amount ? formatMoney(currentProduct.depositInfo.amount) : '—'}
+                        </span>
+                      </div>
+                      <div className="depositInfoRow">
+                        <span className="depositInfoLabel">Ngày cọc:</span>
+                        <span className="depositInfoValue">{formatDate(currentProduct.depositInfo.date)}</span>
+                      </div>
+                      <div className="depositInfoRow">
+                        <span className="depositInfoLabel">NV / Chi nhánh:</span>
+                        <span className="depositInfoValue">
+                          {currentProduct.depositInfo.staff} / {currentProduct.depositInfo.location}
+                        </span>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Right Gallery */}
@@ -3333,6 +3380,47 @@ export default function App() {
                       <option key={l} value={l}>{l}</option>
                     ))}
                   </select>
+                </div>
+              </div>
+
+              <div className="modalFormFields">
+                <div className="modalFieldGroup">
+                  <label htmlFor="m-dep-customer-name">Tên khách hàng</label>
+                  <input
+                    id="m-dep-customer-name"
+                    type="text"
+                    value={mDepCustomerName}
+                    onChange={(e) => setMDepCustomerName(e.target.value)}
+                    placeholder="Nguyễn Văn A"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="modalFormFields">
+                <div className="modalFieldGroup">
+                  <label htmlFor="m-dep-customer-phone">Số điện thoại</label>
+                  <input
+                    id="m-dep-customer-phone"
+                    type="tel"
+                    value={mDepCustomerPhone}
+                    onChange={(e) => setMDepCustomerPhone(e.target.value)}
+                    placeholder="0901234567"
+                    pattern="[0-9]+"
+                    required
+                  />
+                </div>
+                <div className="modalFieldGroup">
+                  <label htmlFor="m-dep-amount">Tiền cọc (VNĐ)</label>
+                  <input
+                    id="m-dep-amount"
+                    type="number"
+                    value={mDepAmount}
+                    onChange={(e) => setMDepAmount(e.target.value)}
+                    placeholder="500000"
+                    min="1"
+                    required
+                  />
                 </div>
               </div>
 

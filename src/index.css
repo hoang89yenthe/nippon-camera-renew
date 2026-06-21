@@ -2645,3 +2645,63 @@ body {
 .btnDeleteConfirm:hover {
   background-color: #c0392b;
 }
+
+/* Deposit info block in product detail */
+.depositInfoBlock {
+  margin-top: 14px;
+  padding: 12px 14px;
+  background: #fffbeb;
+  border: 1.5px solid #f59e0b;
+  border-radius: 10px;
+}
+
+.depositInfoTitle {
+  font-weight: 700;
+  font-size: 13px;
+  color: #b45309;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.depositInfoRow {
+  display: flex;
+  gap: 6px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.depositInfoLabel {
+  font-weight: 600;
+  color: #92400e;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.depositInfoValue {
+  color: #1a1a2e;
+}
+
+/* Modal input field shared style */
+.modalFieldGroup input[type="text"],
+.modalFieldGroup input[type="tel"],
+.modalFieldGroup input[type="number"] {
+  width: 100%;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-light);
+  background-color: #ffffff;
+  font-family: var(--font-primary);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--brand-dark);
+  outline: none;
+}
+
+.modalFieldGroup input[type="text"]:focus,
+.modalFieldGroup input[type="tel"]:focus,
+.modalFieldGroup input[type="number"]:focus {
+  border-color: var(--brand-green);
+  box-shadow: 0 0 0 2px rgba(46, 204, 113, 0.15);
+}
