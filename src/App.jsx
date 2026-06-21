@@ -1260,6 +1260,7 @@ export default function App() {
   const [currentProduct, setCurrentProduct] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [priceFilter, setPriceFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [activeThumbIndex, setActiveThumbIndex] = useState(0);
 
@@ -2056,6 +2057,7 @@ export default function App() {
     setCurrentBrand(brand);
     setCurrentPage(1);
     setPriceFilter('');
+    setStatusFilter('');
     setCurrentProduct(null);
   };
 
@@ -2069,7 +2071,9 @@ export default function App() {
     if (searchQuery.trim() !== '') {
       const q = searchQuery.toLowerCase().trim();
       result = result.filter(p =>
-        p.name.toLowerCase().includes(q) || p.specs.toLowerCase().includes(q)
+        p.name.toLowerCase().includes(q) ||
+        p.specs.toLowerCase().includes(q) ||
+        p.serial?.toLowerCase().includes(q)
       );
     }
     if (priceFilter === 'duoi-15') {
@@ -2079,9 +2083,23 @@ export default function App() {
     } else if (priceFilter === 'tren-30') {
       result = result.filter(p => p.price > 30000000);
     }
+    if (statusFilter) {
+      result = result.filter(p => p.status === statusFilter);
+    }
 
     return result;
-  }, [products, currentBrand, searchQuery, priceFilter]);
+  }, [products, currentBrand, searchQuery, priceFilter, statusFilter]);
+
+  // Global search across all brands (used when on brand grid with a search query)
+  const globalSearchResults = useMemo(() => {
+    if (!searchQuery.trim()) return [];
+    const q = searchQuery.toLowerCase().trim();
+    return products.filter(p =>
+      p.name.toLowerCase().includes(q) ||
+      p.specs.toLowerCase().includes(q) ||
+      p.serial?.toLowerCase().includes(q)
+    );
+  }, [products, searchQuery]);
 
   const itemsPerPage = 6;
 
@@ -2183,19 +2201,75 @@ export default function App() {
             </div>
           )}
 
-          {/* 1. BRAND GRID VIEW */}
+          {/* 1. BRAND GRID VIEW (or global search results) */}
           {!currentBrand && !currentProduct && (
-            <div className="brandGrid" id="brand-grid">
-              {Object.keys(BRAND_SLOGANS).map(b => (
-                <button
-                  key={b}
-                  className={`brandCard ${b === 'FUJI' ? 'highlight-brand' : ''}`}
-                  onClick={() => handleBrandSelect(b)}
-                >
-                  {b}
-                </button>
-              ))}
-            </div>
+            searchQuery.trim() !== '' ? (
+              <div id="global-search-results">
+                <h2 className="globalSearchHeading">KẾT QUẢ TÌM KIẾM</h2>
+                {globalSearchResults.length === 0 ? (
+                  <div className="noProducts">
+                    <p>Không tìm thấy sản phẩm nào phù hợp.</p>
+                  </div>
+                ) : (
+                  <>
+                    <p className="globalSearchCount">{globalSearchResults.length} sản phẩm tìm thấy</p>
+                    <div className="productGrid">
+                      {globalSearchResults.map(p => {
+                        const { text: statusText, cls: statusClass } = STATUS_DISPLAY[p.status] ?? STATUS_DISPLAY[PRODUCT_STATUS.IN_STOCK];
+                        return (
+                          <div
+                            key={p.id}
+                            className="productCard"
+                            onClick={() => {
+                              setCurrentBrand(p.brand);
+                              setCurrentProduct(p);
+                              setActiveThumbIndex(0);
+                            }}
+                          >
+                            <div className="productCardImage">
+                              {getProductPhoto(p.id) && !failedImages.has(p.id)
+                                ? <img
+                                    src={getProductPhoto(p.id)}
+                                    alt={p.name}
+                                    className="productCardImg"
+                                    loading="lazy"
+                                    referrerPolicy="no-referrer"
+                                    onError={() => setFailedImages(prev => new Set([...prev, p.id]))}
+                                  />
+                                : <svg className="placeholder-img-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                                    <polyline points="21 15 16 10 5 21"/>
+                                  </svg>
+                              }
+                            </div>
+                            <div className="productCardInfo">
+                              <div className={`productCardStatus ${statusClass}`}>{statusText}</div>
+                              <h3 className="productCardTitle">{p.name}</h3>
+                              <p className="productCardSpecs">{p.specs.split(' / ')[0]}</p>
+                              <p className="productCardId">SKU: {p.id} · {p.brand}</p>
+                              <div className="productCardPrice">{formatMoneyRaw(p.price)}</div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </>
+                )}
+              </div>
+            ) : (
+              <div className="brandGrid" id="brand-grid">
+                {Object.keys(BRAND_SLOGANS).map(b => (
+                  <button
+                    key={b}
+                    className={`brandCard ${b === 'FUJI' ? 'highlight-brand' : ''}`}
+                    onClick={() => handleBrandSelect(b)}
+                  >
+                    {b}
+                  </button>
+                ))}
+              </div>
+            )
           )}
 
           {/* 2. SUB-BRAND PRODUCT LIST VIEW */}
@@ -2237,6 +2311,24 @@ export default function App() {
                     </select>
                   </div>
                 </div>
+              </div>
+
+              {/* Status filter pills */}
+              <div className="statusFilterBar">
+                {[
+                  { value: '',                          label: 'Tất cả' },
+                  { value: PRODUCT_STATUS.IN_STOCK,     label: 'Còn hàng' },
+                  { value: PRODUCT_STATUS.DEPOSITED,    label: 'Đã cọc' },
+                  { value: PRODUCT_STATUS.SOLD,         label: 'Đã bán' },
+                ].map(({ value, label }) => (
+                  <button
+                    key={value}
+                    className={`statusFilterBtn ${statusFilter === value ? 'active' : ''} ${value ? STATUS_DISPLAY[value]?.cls : ''}`}
+                    onClick={() => { setStatusFilter(value); setCurrentPage(1); }}
+                  >
+                    {label}
+                  </button>
+                ))}
               </div>
 
               {pagedProducts.length === 0 ? (

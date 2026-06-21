@@ -506,6 +506,62 @@ body {
   margin-top: auto;
 }
 
+/* ── STATUS FILTER BAR (product list view) ── */
+.statusFilterBar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.statusFilterBtn {
+  height: 32px;
+  padding: 0 14px;
+  border-radius: 16px;
+  border: 1px solid var(--border-light);
+  background-color: #ffffff;
+  font-family: var(--font-primary);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary-light);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.statusFilterBtn:hover {
+  border-color: #909399;
+  color: var(--brand-dark);
+}
+
+.statusFilterBtn.active {
+  color: #ffffff;
+  border-color: transparent;
+  background-color: var(--brand-dark);
+}
+
+.statusFilterBtn.active.status-con { background-color: var(--status-con-text); }
+.statusFilterBtn.active.status-coc { background-color: var(--status-coc-text); }
+.statusFilterBtn.active.status-ban { background-color: var(--status-ban-text); }
+
+/* ── GLOBAL SEARCH RESULTS (brand grid → search mode) ── */
+.globalSearchHeading {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--brand-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 8px 0;
+}
+
+.globalSearchCount {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary-light);
+  margin: 0 0 20px 0;
+}
+
 .noProducts {
   grid-column: 1 / -1;
   text-align: center;
