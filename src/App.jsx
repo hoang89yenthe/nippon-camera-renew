@@ -1311,6 +1311,7 @@ export default function App() {
   const [historyTypeFilter, setHistoryTypeFilter] = useState('');
   const [historyFromDate, setHistoryFromDate] = useState('');
   const [historyToDate, setHistoryToDate] = useState('');
+  const [expandedLogId, setExpandedLogId] = useState(null);
 
   // Stats period filter
   const [statsPeriod, setStatsPeriod] = useState('all');
@@ -1449,8 +1450,13 @@ export default function App() {
   const getProductPhotoList = (productId) => {
     const imgs = productImages[productId];
     if (imgs && imgs.length > 0) return imgs;
+    // Try a local image file first (public/images/<productId>.jpg)
+    const localPath = `/images/${productId}.jpg`;
+    const externalList = [];
     const single = PRODUCT_PHOTOS[productId];
-    return single ? [single] : [];
+    if (single) externalList.push(single);
+    // Return the local path (if exists) plus any external fallback URLs
+    return [localPath, ...externalList];
   };
 
   const formatMoneyRaw = (num) => num.toLocaleString('vi-VN');
@@ -1595,6 +1601,21 @@ export default function App() {
     );
 
     showToast(`Đã giải phóng máy ${currentProduct.name} về trạng thái Còn hàng!`);
+  };
+
+  const handleViewProductFromLog = (log) => {
+    const found = products.find(p =>
+      (log.serial && p.serial === log.serial) ||
+      (log.productName && `${p.brand} ${p.name}` === log.productName)
+    );
+    if (!found) {
+      showToast('Sản phẩm này không còn trong hệ thống (đã bị xóa).', 'error');
+      return;
+    }
+    setCurrentBrand(found.brand);
+    setCurrentProduct(found);
+    setCurrentTab('check-gia');
+    setExpandedLogId(null);
   };
 
   // ── Edit product handlers ──
@@ -3335,11 +3356,26 @@ export default function App() {
             ) : (
               filteredHistory.map(log => {
                 const { text: typeText, cls: typeClass } = LOG_DISPLAY[log.type] ?? LOG_DISPLAY[LOG_TYPE.SYSTEM];
+                const isExpanded = expandedLogId === log.id;
+                const linkedProduct = log.serial
+                  ? products.find(p => p.serial === log.serial)
+                  : products.find(p => log.productName && `${p.brand} ${p.name}` === log.productName);
+                const hasProduct = !!linkedProduct;
+                const canLink = !!(log.serial || log.productName);
+
                 return (
-                  <div key={log.id} className="historyItem">
+                  <div
+                    key={log.id}
+                    className={`historyItem ${isExpanded ? 'expanded' : ''}`}
+                    onClick={() => setExpandedLogId(isExpanded ? null : log.id)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={e => e.key === 'Enter' && setExpandedLogId(isExpanded ? null : log.id)}
+                  >
                     <div className="historyMeta">
                       <span className={`historyType ${typeClass}`}>{typeText}</span>
                       <span className="historyTime">{formatDate(log.date)}</span>
+                      <span className="historyExpandIcon">{isExpanded ? '▲' : '▼'}</span>
                     </div>
                     <div className="historyContent">
                       <p className="historyDetails">{log.details}</p>
@@ -3349,6 +3385,39 @@ export default function App() {
                         <span><strong>Chi nhánh:</strong> {log.location}</span>
                       </div>
                     </div>
+
+                    {isExpanded && (
+                      <div className="historyExpandBody" onClick={e => e.stopPropagation()}>
+                        {log.serial && (
+                          <div className="historyExpandRow">
+                            <span className="historyExpandLabel">Serial:</span>
+                            <span className="historyExpandValue">{log.serial}</span>
+                          </div>
+                        )}
+                        {log.productName && (
+                          <div className="historyExpandRow">
+                            <span className="historyExpandLabel">Sản phẩm:</span>
+                            <span className="historyExpandValue">{log.productName}</span>
+                          </div>
+                        )}
+                        {linkedProduct && (
+                          <div className="historyExpandRow">
+                            <span className="historyExpandLabel">Trạng thái hiện tại:</span>
+                            <span className={`historyExpandStatus status-${linkedProduct.status === PRODUCT_STATUS.IN_STOCK ? 'con' : linkedProduct.status === PRODUCT_STATUS.DEPOSITED ? 'coc' : 'ban'}`}>
+                              {linkedProduct.status === PRODUCT_STATUS.IN_STOCK ? 'Còn hàng' : linkedProduct.status === PRODUCT_STATUS.DEPOSITED ? 'Đang giữ cọc' : 'Đã bán'}
+                            </span>
+                          </div>
+                        )}
+                        {canLink && (
+                          <button
+                            className={`historyViewProductBtn ${!hasProduct ? 'deleted' : ''}`}
+                            onClick={() => hasProduct ? handleViewProductFromLog(log) : showToast('Sản phẩm đã bị xóa khỏi hệ thống.', 'error')}
+                          >
+                            {hasProduct ? 'Xem sản phẩm →' : 'Sản phẩm đã xóa'}
+                          </button>
+                        )}
+                      </div>
+                    )}
                   </div>
                 );
               })

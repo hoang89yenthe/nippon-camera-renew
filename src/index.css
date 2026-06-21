@@ -1726,12 +1726,108 @@ body {
   flex-direction: column;
   gap: 10px;
   box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: border-color 0.18s, box-shadow 0.18s;
+  outline: none;
+}
+
+.historyItem:hover {
+  border-color: #b0b4bd;
+  box-shadow: var(--shadow-md);
+}
+
+.historyItem.expanded {
+  border-color: var(--brand-dark);
+  box-shadow: 0 4px 16px rgba(35,31,32,0.1);
 }
 
 .historyMeta {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 8px;
+}
+
+.historyExpandIcon {
+  font-size: 10px;
+  color: #b0b4bd;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.historyExpandBody {
+  border-top: 1px solid var(--border-light);
+  padding-top: 12px;
+  margin-top: 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.historyExpandRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.historyExpandLabel {
+  font-weight: 600;
+  color: var(--text-secondary-light);
+  white-space: nowrap;
+  min-width: 130px;
+}
+
+.historyExpandValue {
+  color: var(--brand-dark);
+  font-weight: 500;
+}
+
+.historyExpandStatus {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 10px;
+  border-radius: 20px;
+}
+
+.historyExpandStatus.status-con {
+  background: var(--status-con-bg);
+  color: var(--status-con-text);
+}
+
+.historyExpandStatus.status-coc {
+  background: var(--status-coc-bg);
+  color: var(--status-coc-text);
+}
+
+.historyExpandStatus.status-ban {
+  background: var(--status-ban-bg);
+  color: var(--status-ban-text);
+}
+
+.historyViewProductBtn {
+  align-self: flex-start;
+  margin-top: 4px;
+  padding: 7px 16px;
+  background: var(--brand-dark);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-family: var(--font-primary);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.historyViewProductBtn:hover {
+  background: var(--brand-dark-soft);
+}
+
+.historyViewProductBtn.deleted {
+  background: #e0e2e6;
+  color: #909399;
+  cursor: not-allowed;
 }
 
 .historyType {
