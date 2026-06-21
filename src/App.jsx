@@ -1288,6 +1288,7 @@ export default function App() {
   const [fDesc, setFDesc] = useState('');
   const [fImages, setFImages] = useState([]);
   const [isDragging, setIsDragging] = useState(false);
+  const [previewImage, setPreviewImage] = useState(null);
 
   const [productImages, setProductImages] = useState(() => {
     try { return JSON.parse(localStorage.getItem('nippon_camera_images') || '{}'); }
@@ -2716,10 +2717,18 @@ export default function App() {
               {/* File list */}
               {fImages.map((img, idx) => (
                 <div key={img.id} className="uploadFileItem">
-                  <div className="uploadFileThumbnail">
+                  <div
+                    className="uploadFileThumbnail"
+                    onClick={() => setPreviewImage(img.preview)}
+                    title="Bấm để xem ảnh lớn"
+                  >
                     <img src={img.preview} alt="" />
                   </div>
-                  <div className="uploadFileInfo">
+                  <div
+                    className="uploadFileInfo"
+                    onClick={() => setPreviewImage(img.preview)}
+                    style={{ cursor: 'pointer' }}
+                  >
                     <span className="uploadFileName">{img.name}</span>
                     <span className="uploadFileSize">{Math.round(img.size / 1024)} KB</span>
                   </div>
@@ -2902,6 +2911,19 @@ export default function App() {
               />
             </div>
           </div>
+        </div>
+      )}
+
+      {/* ── IMAGE PREVIEW LIGHTBOX ── */}
+      {previewImage && (
+        <div className="lightboxOverlay" onClick={() => setPreviewImage(null)}>
+          <button className="lightboxClose" onClick={() => setPreviewImage(null)}>✕</button>
+          <img
+            className="lightboxImg"
+            src={previewImage}
+            alt="preview"
+            onClick={e => e.stopPropagation()}
+          />
         </div>
       )}
 
