@@ -259,14 +259,7 @@ body {
   box-shadow: var(--shadow-md);
 }
 
-.brandCard.highlight-brand {
-  background-color: #abebc6; /* Fuji highlighted green in Screen 2 */
-  border-color: #58d68d;
-}
-
-.brandCard.highlight-brand:hover {
-  background-color: #82e0aa;
-}
+/* highlight-brand styling intentionally removed to keep a uniform brand grid */
 
 /* ── BACK BUTTON (shared across views) ── */
 .viewBackBtn {
