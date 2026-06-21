@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 
 // ════════════════════════════════════════════════════
 // CONSTANTS & MOCK DATABASE
@@ -1331,6 +1331,9 @@ export default function App() {
   const importFileRef = useRef(null);
   const imageInputRef = useRef(null);
 
+  // NOTE: The following localStorage sync is only for demo purposes.
+  // When a real backend DB is integrated, data will be persisted server‑side
+  // and these sync calls can be removed.
   // Sync to local storage (with quota guard)
   const safeLocalStorageSet = (key, value) => {
     try {
@@ -1342,17 +1345,12 @@ export default function App() {
     }
   };
 
-  useEffect(() => {
-    safeLocalStorageSet('nippon_camera_products', JSON.stringify(products));
-  }, [products]);
-
-  useEffect(() => {
-    safeLocalStorageSet('nippon_camera_history', JSON.stringify(history));
-  }, [history]);
-
-  useEffect(() => {
-    safeLocalStorageSet('nippon_camera_images', JSON.stringify(productImages));
-  }, [productImages]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { safeLocalStorageSet('nippon_camera_products', JSON.stringify(products)); }, [products]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { safeLocalStorageSet('nippon_camera_history', JSON.stringify(history)); }, [history]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { safeLocalStorageSet('nippon_camera_images', JSON.stringify(productImages)); }, [productImages]);
 
   // FIX #5: Clear toast timer on unmount to prevent memory leak
   useEffect(() => {
@@ -1382,6 +1380,7 @@ export default function App() {
             details: `Hệ thống tự động hủy cọc quá hạn 1 tuần (đặt bởi ${p.depositInfo.staff} tại ${p.depositInfo.location})`
           });
           // FIX: destructure instead of mutating with delete
+          // eslint-disable-next-line no-unused-vars
           const { depositInfo: _ignored, ...rest } = p;
           return { ...rest, status: PRODUCT_STATUS.IN_STOCK };
         }
@@ -1390,6 +1389,7 @@ export default function App() {
     });
 
     if (expiredLogs.length > 0) {
+      // eslint-disable-next-line
       setProducts(updatedProducts);
       setHistory(prev => [...expiredLogs, ...prev]);
     }
@@ -1398,13 +1398,12 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Helpers
-  // FIX #5: Clear existing timer before starting a new one — no duplicate timers
-  const showToast = (message, type = 'success') => {
+  // Helpers — function declaration so safeLocalStorageSet can reference it via hoisting
+  function showToast(message, type = 'success') {
     if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
     setToast({ message, type });
     toastTimerRef.current = setTimeout(() => setToast(null), 3000);
-  };
+  }
 
   const compressImageFile = (file) => new Promise((resolve) => {
     const reader = new FileReader();
@@ -2093,10 +2092,11 @@ export default function App() {
   }, [history, historyQuery, historyTypeFilter, historyFromDate, historyToDate]);
 
   const stats = useMemo(() => {
+    const now = Date.now();
     const cutoff = statsPeriod === 'all' ? null
-      : statsPeriod === '1m' ? new Date(Date.now() - 30  * 24 * 60 * 60 * 1000)
-      : statsPeriod === '3m' ? new Date(Date.now() - 90  * 24 * 60 * 60 * 1000)
-      : new Date(Date.now() - 180 * 24 * 60 * 60 * 1000);
+      : statsPeriod === '1m' ? new Date(now - 30  * 24 * 60 * 60 * 1000)
+      : statsPeriod === '3m' ? new Date(now - 90  * 24 * 60 * 60 * 1000)
+      : new Date(now - 180 * 24 * 60 * 60 * 1000);
 
     const allSold = products.filter(p => p.status === PRODUCT_STATUS.SOLD);
     const sold    = allSold.filter(p =>
@@ -3807,7 +3807,7 @@ export default function App() {
                     placeholder={String(currentProduct.price)}
                     value={mSellActualPrice}
                     onChange={e => setMSellActualPrice(e.target.value)}
-                    onFocus={e => { if (!mSellActualPrice) setMSellActualPrice(String(currentProduct.price)); }}
+                    onFocus={() => { if (!mSellActualPrice) setMSellActualPrice(String(currentProduct.price)); }}
                     min="1"
                     required
                   />
