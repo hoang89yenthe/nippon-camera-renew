@@ -1275,6 +1275,9 @@ export default function App() {
   const [sellModalOpen, setSellModalOpen] = useState(false);
   const [mSellStaff, setMSellStaff] = useState(STAFFS[0]);
   const [mSellLocation, setMSellLocation] = useState(LOCATIONS[0]);
+  const [mSellCustomerName, setMSellCustomerName] = useState('');
+  const [mSellCustomerPhone, setMSellCustomerPhone] = useState('');
+  const [mSellActualPrice, setMSellActualPrice] = useState('');
 
   // Entry form state (NHẬP LIỆU)
   const [fBrand, setFBrand] = useState('FUJI');
@@ -1529,7 +1532,15 @@ export default function App() {
     e.preventDefault();
     if (!currentProduct) return;
 
-    const sellInfo = { staff: mSellStaff, location: mSellLocation, date: new Date().toISOString() };
+    const actualPrice = parseInt(mSellActualPrice, 10) || currentProduct.price;
+    const sellInfo = {
+      staff: mSellStaff,
+      location: mSellLocation,
+      date: new Date().toISOString(),
+      customerName: mSellCustomerName,
+      customerPhone: mSellCustomerPhone,
+      actualPrice,
+    };
 
     setProducts(prev => prev.map(p => {
       if (p.id !== currentProduct.id) return p;
@@ -1544,16 +1555,21 @@ export default function App() {
       return { ...rest, status: PRODUCT_STATUS.SOLD, sellInfo };
     });
 
+    const discount = currentProduct.price - actualPrice;
+    const discountNote = discount > 0 ? `, giảm giá ${formatMoney(discount)}` : '';
     addLog(
       LOG_TYPE.SELL,
       mSellStaff,
       mSellLocation,
       `${currentProduct.brand} ${currentProduct.name}`,
       currentProduct.serial,
-      `Xác nhận đã bán máy ${currentProduct.brand} ${currentProduct.name} (Serial: ${currentProduct.serial}) cho khách, thực hiện bởi ${mSellStaff} tại chi nhánh ${mSellLocation}.`
+      `Đã bán máy ${currentProduct.brand} ${currentProduct.name} (Serial: ${currentProduct.serial}) cho khách ${mSellCustomerName} (${mSellCustomerPhone}), giá bán ${formatMoney(actualPrice)}${discountNote}. NV: ${mSellStaff} tại ${mSellLocation}.`
     );
 
     showToast(`Đã bán máy ${currentProduct.name} thành công!`);
+    setMSellCustomerName('');
+    setMSellCustomerPhone('');
+    setMSellActualPrice('');
     setSellModalOpen(false);
   };
 
@@ -1618,6 +1634,16 @@ export default function App() {
   };
 
   const handleDeleteProduct = () => {
+    if (currentProduct.status === PRODUCT_STATUS.DEPOSITED) {
+      showToast('Không thể xoá máy đang giữ cọc! Hủy cọc trước.', 'error');
+      setDeleteModalOpen(false);
+      return;
+    }
+    if (currentProduct.status === PRODUCT_STATUS.SOLD) {
+      showToast('Không thể xoá máy đã bán — dữ liệu doanh thu sẽ mất!', 'error');
+      setDeleteModalOpen(false);
+      return;
+    }
     const { brand, name, serial, location } = currentProduct;
     setProducts(prev => prev.filter(p => p.id !== currentProduct.id));
     addLog(
@@ -1750,7 +1776,7 @@ export default function App() {
 
     /* Sheet 5 — Chi tiết sản phẩm đã bán */
     const ws5 = XLSX.utils.aoa_to_sheet([
-      ['STT', 'THƯƠNG HIỆU', 'TÊN MÁY', 'SERIAL', 'GIÁ BÁN (VND)', 'NHÂN VIÊN BÁN', 'CHI NHÁNH BÁN', 'NGÀY BÁN'],
+      ['STT', 'THƯƠNG HIỆU', 'TÊN MÁY', 'SERIAL', 'GIÁ NIÊM YẾT (VND)', 'GIÁ BÁN THỰC TẾ (VND)', 'KHÁCH MUA', 'SĐT KHÁCH', 'NHÂN VIÊN BÁN', 'CHI NHÁNH BÁN', 'NGÀY BÁN'],
       ...[...stats.allSold]
         .sort((a, b) => new Date(b.sellInfo?.date || 0) - new Date(a.sellInfo?.date || 0))
         .map((p, i) => [
@@ -1759,6 +1785,9 @@ export default function App() {
           p.name,
           p.serial,
           p.price,
+          p.sellInfo?.actualPrice || p.price,
+          p.sellInfo?.customerName || '',
+          p.sellInfo?.customerPhone || '',
           p.sellInfo?.staff    || p.staff,
           p.sellInfo?.location || p.location,
           p.sellInfo?.date
@@ -1802,12 +1831,15 @@ export default function App() {
         const sellDate = p.sellInfo?.date
           ? new Date(p.sellInfo.date).toLocaleDateString('vi-VN')
           : '—';
+        const actualPrice = p.sellInfo?.actualPrice || p.price;
         return `<tr>
           <td class="num">${i + 1}</td>
           <td>${p.brand}</td>
           <td>${p.name}</td>
           <td>${p.serial}</td>
           <td class="num">${fn(p.price)}</td>
+          <td class="num">${fn(actualPrice)}</td>
+          <td>${p.sellInfo?.customerName || '—'}</td>
           <td>${p.sellInfo?.staff || p.staff}</td>
           <td>${p.sellInfo?.location || p.location}</td>
           <td>${sellDate}</td>
@@ -1815,7 +1847,7 @@ export default function App() {
       }).join('');
 
     const noSoldMsg = stats.allSold.length === 0
-      ? '<tr><td colspan="8" style="text-align:center;color:#999;padding:16px">Chưa có sản phẩm nào được bán.</td></tr>'
+      ? '<tr><td colspan="10" style="text-align:center;color:#999;padding:16px">Chưa có sản phẩm nào được bán.</td></tr>'
       : detailRows;
 
     const html = `<!DOCTYPE html>
@@ -1940,7 +1972,9 @@ export default function App() {
           <th>Hãng</th>
           <th>Tên máy</th>
           <th>Serial</th>
-          <th class="num">Giá bán (đ)</th>
+          <th class="num">Giá niêm yết (đ)</th>
+          <th class="num">Giá bán thực (đ)</th>
+          <th>Khách mua</th>
           <th>Nhân viên</th>
           <th>Chi nhánh</th>
           <th>Ngày bán</th>
@@ -2045,9 +2079,10 @@ export default function App() {
     const deposited = products.filter(p => p.status === PRODUCT_STATUS.DEPOSITED);
     const inStock   = products.filter(p => p.status === PRODUCT_STATUS.IN_STOCK);
 
-    const totalRevenue = sold.reduce((sum, p) => sum + p.price, 0);
+    const salePrice = (p) => p.sellInfo?.actualPrice || p.price;
+    const totalRevenue = sold.reduce((sum, p) => sum + salePrice(p), 0);
 
-    const groupBy = (arr, keyFn, valFn = p => p.price) => {
+    const groupBy = (arr, keyFn, valFn = salePrice) => {
       const map = {};
       arr.forEach(p => {
         const k = keyFn(p);
@@ -2531,6 +2566,39 @@ export default function App() {
                     </div>
                     <span>{currentProduct.staff}</span>
                   </div>
+
+                  {currentProduct.status === PRODUCT_STATUS.SOLD && currentProduct.sellInfo && (
+                    <div className="depositInfoBlock sellInfoBlock">
+                      <div className="depositInfoTitle">Thông tin bán hàng</div>
+                      <div className="depositInfoRow">
+                        <span className="depositInfoLabel">Khách mua:</span>
+                        <span className="depositInfoValue">
+                          {currentProduct.sellInfo.customerName || '—'}{currentProduct.sellInfo.customerPhone ? ` — ${currentProduct.sellInfo.customerPhone}` : ''}
+                        </span>
+                      </div>
+                      <div className="depositInfoRow">
+                        <span className="depositInfoLabel">Giá bán thực:</span>
+                        <span className="depositInfoValue" style={{color: '#c7282a', fontWeight: 700}}>
+                          {currentProduct.sellInfo.actualPrice ? formatMoney(currentProduct.sellInfo.actualPrice) : formatMoney(currentProduct.price)}
+                          {currentProduct.sellInfo.actualPrice && currentProduct.sellInfo.actualPrice < currentProduct.price && (
+                            <span style={{color:'#888', fontWeight:400, fontSize:'12px', marginLeft:'6px'}}>
+                              (giảm {formatMoney(currentProduct.price - currentProduct.sellInfo.actualPrice)})
+                            </span>
+                          )}
+                        </span>
+                      </div>
+                      <div className="depositInfoRow">
+                        <span className="depositInfoLabel">Ngày bán:</span>
+                        <span className="depositInfoValue">{formatDate(currentProduct.sellInfo.date)}</span>
+                      </div>
+                      <div className="depositInfoRow">
+                        <span className="depositInfoLabel">NV / Chi nhánh:</span>
+                        <span className="depositInfoValue">
+                          {currentProduct.sellInfo.staff} / {currentProduct.sellInfo.location}
+                        </span>
+                      </div>
+                    </div>
+                  )}
 
                   {currentProduct.status === PRODUCT_STATUS.DEPOSITED && currentProduct.depositInfo && (
                     <div className="depositInfoBlock">
@@ -3596,7 +3664,7 @@ export default function App() {
       {sellModalOpen && currentProduct && (
         <div className="modalOverlay" id="sell-modal">
           <div className="modalBox">
-            <button className="modalCloseBtn" onClick={() => setSellModalOpen(false)}>
+            <button className="modalCloseBtn" onClick={() => { setSellModalOpen(false); setMSellCustomerName(''); setMSellCustomerPhone(''); setMSellActualPrice(''); }}>
               ✕
             </button>
 
@@ -3618,9 +3686,52 @@ export default function App() {
             </div>
 
             <form onSubmit={handleConfirmSell}>
-              <div className="modalFormFields">
+              <div className="modalFormFieldsStacked">
                 <div className="modalFieldGroup">
-                  <label htmlFor="m-sell-staff">Tên người bán</label>
+                  <label htmlFor="m-sell-customer-name">Tên khách mua *</label>
+                  <input
+                    id="m-sell-customer-name"
+                    type="text"
+                    placeholder="Họ tên khách hàng"
+                    value={mSellCustomerName}
+                    onChange={e => setMSellCustomerName(e.target.value)}
+                    required
+                  />
+                </div>
+
+                <div className="modalFieldGroup">
+                  <label htmlFor="m-sell-customer-phone">Số điện thoại *</label>
+                  <input
+                    id="m-sell-customer-phone"
+                    type="tel"
+                    placeholder="0xxx xxx xxx"
+                    value={mSellCustomerPhone}
+                    onChange={e => setMSellCustomerPhone(e.target.value)}
+                    required
+                  />
+                </div>
+
+                <div className="modalFieldGroup">
+                  <label htmlFor="m-sell-actual-price">Giá bán thực tế (VNĐ) *</label>
+                  <input
+                    id="m-sell-actual-price"
+                    type="number"
+                    placeholder={String(currentProduct.price)}
+                    value={mSellActualPrice}
+                    onChange={e => setMSellActualPrice(e.target.value)}
+                    onFocus={e => { if (!mSellActualPrice) setMSellActualPrice(String(currentProduct.price)); }}
+                    min="1"
+                    required
+                  />
+                  {mSellActualPrice && parseInt(mSellActualPrice) < currentProduct.price && (
+                    <span style={{fontSize:'12px', color:'#e67e22', marginTop:'4px', display:'block'}}>
+                      Giảm giá: {formatMoney(currentProduct.price - parseInt(mSellActualPrice))}
+                    </span>
+                  )}
+                </div>
+
+                <div className="modalFieldGroup">
+                  <label htmlFor="m-sell-staff">Nhân viên bán</label>
                   <select
                     id="m-sell-staff"
                     value={mSellStaff}
@@ -3634,6 +3745,7 @@ export default function App() {
                 </div>
 
                 <div className="modalFieldGroup">
+                  <label htmlFor="m-sell-location">Chi nhánh</label>
                   <select
                     id="m-sell-location"
                     value={mSellLocation}
@@ -3647,7 +3759,7 @@ export default function App() {
                 </div>
               </div>
 
-              <button type="submit" className="modalSubmitBtn btnBan">
+              <button type="submit" className="modalSubmitBtn btnBan" style={{marginTop:'4px'}}>
                 XÁC NHẬN ĐÃ BÁN
               </button>
             </form>

@@ -1913,6 +1913,24 @@ body {
   align-items: center;
 }
 
+.modalFormFieldsStacked {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.modalFormFieldsStacked .modalFieldGroup {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.modalFormFieldsStacked .modalFieldGroup select,
+.modalFormFieldsStacked .modalFieldGroup input {
+  width: 100%;
+}
+
 .modalFieldGroup {
   flex: 1;
   display: flex;
@@ -2797,6 +2815,23 @@ body {
   background: #fffbeb;
   border: 1.5px solid #f59e0b;
   border-radius: 10px;
+}
+
+.sellInfoBlock {
+  background: #f0fdf4;
+  border-color: #22c55e;
+}
+
+.sellInfoBlock .depositInfoTitle {
+  color: #15803d;
+}
+
+.sellInfoBlock .depositInfoLabel {
+  color: #166534;
+}
+
+.sellInfoBlock .depositInfoValue {
+  color: #14532d;
 }
 
 .depositInfoTitle {
