@@ -2090,6 +2090,40 @@ body {
   background: var(--border-light);
 }
 
+/* Period filter pill buttons */
+.statsPeriodFilter {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.statsPeriodBtn {
+  height: 32px;
+  padding: 0 16px;
+  border-radius: 16px;
+  border: 1px solid var(--border-light);
+  background-color: #ffffff;
+  font-family: var(--font-primary);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary-light);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.statsPeriodBtn:hover {
+  border-color: #909399;
+  color: var(--brand-dark);
+}
+
+.statsPeriodBtn.active {
+  background-color: var(--brand-dark);
+  border-color: var(--brand-dark);
+  color: #ffffff;
+}
+
 /* KPI grid */
 .kpiGrid {
   display: grid;
@@ -2477,6 +2511,60 @@ body {
 .historyTypeBtn.active.type-coc   { background-color: var(--status-coc-text); }
 .historyTypeBtn.active.type-ban   { background-color: var(--status-ban-text); }
 .historyTypeBtn.active.type-system { background-color: #7f8c8d; }
+
+/* Date range filter */
+.historyDateRange {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.historyDateRange label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary-light);
+  white-space: nowrap;
+}
+
+.historyDateRange input[type="date"] {
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid var(--border-light);
+  padding: 0 10px;
+  font-family: var(--font-primary);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--brand-dark);
+  background-color: #ffffff;
+  outline: none;
+  transition: border-color 0.2s;
+  cursor: pointer;
+}
+
+.historyDateRange input[type="date"]:focus {
+  border-color: var(--brand-red);
+}
+
+.historyDateClearBtn {
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid var(--status-ban-text);
+  background-color: transparent;
+  font-family: var(--font-primary);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--status-ban-text);
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.historyDateClearBtn:hover {
+  background-color: var(--status-ban-text);
+  color: #ffffff;
+}
 
 /* Result count */
 .historyResultCount {

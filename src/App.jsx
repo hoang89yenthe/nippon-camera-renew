@@ -1302,6 +1302,11 @@ export default function App() {
   // History search state
   const [historyQuery, setHistoryQuery] = useState('');
   const [historyTypeFilter, setHistoryTypeFilter] = useState('');
+  const [historyFromDate, setHistoryFromDate] = useState('');
+  const [historyToDate, setHistoryToDate] = useState('');
+
+  // Stats period filter
+  const [statsPeriod, setStatsPeriod] = useState('all');
 
   // Edit product state
   const [editMode, setEditMode] = useState(false);
@@ -1998,11 +2003,25 @@ export default function App() {
         log.details?.toLowerCase().includes(q)
       );
     }
+    if (historyFromDate) {
+      result = result.filter(log => log.date >= historyFromDate);
+    }
+    if (historyToDate) {
+      result = result.filter(log => log.date <= historyToDate + 'T23:59:59');
+    }
     return result;
-  }, [history, historyQuery, historyTypeFilter]);
+  }, [history, historyQuery, historyTypeFilter, historyFromDate, historyToDate]);
 
   const stats = useMemo(() => {
-    const sold      = products.filter(p => p.status === PRODUCT_STATUS.SOLD);
+    const cutoff = statsPeriod === 'all' ? null
+      : statsPeriod === '1m' ? new Date(Date.now() - 30  * 24 * 60 * 60 * 1000)
+      : statsPeriod === '3m' ? new Date(Date.now() - 90  * 24 * 60 * 60 * 1000)
+      : new Date(Date.now() - 180 * 24 * 60 * 60 * 1000);
+
+    const allSold = products.filter(p => p.status === PRODUCT_STATUS.SOLD);
+    const sold    = allSold.filter(p =>
+      !cutoff || (p.sellInfo?.date && new Date(p.sellInfo.date) >= cutoff)
+    );
     const deposited = products.filter(p => p.status === PRODUCT_STATUS.DEPOSITED);
     const inStock   = products.filter(p => p.status === PRODUCT_STATUS.IN_STOCK);
 
@@ -2021,6 +2040,10 @@ export default function App() {
         .sort((a, b) => b.rev - a.rev);
     };
 
+    const filteredHistory = cutoff
+      ? history.filter(l => new Date(l.date) >= cutoff)
+      : history;
+
     return {
       totalRevenue,
       soldCount:      sold.length,
@@ -2033,10 +2056,10 @@ export default function App() {
       allSold:     sold,
       topProducts: [...sold].sort((a, b) => b.price - a.price).slice(0, 5),
       logCounts:  Object.fromEntries(
-        Object.values(LOG_TYPE).map(t => [t, history.filter(l => l.type === t).length])
+        Object.values(LOG_TYPE).map(t => [t, filteredHistory.filter(l => l.type === t).length])
       ),
     };
-  }, [products, history]);
+  }, [products, history, statsPeriod]);
 
   const handleTabChange = (tab) => {
     setCurrentTab(tab);
@@ -3058,6 +3081,29 @@ export default function App() {
               ))}
             </div>
 
+            <div className="historyDateRange">
+              <label>Từ ngày</label>
+              <input
+                type="date"
+                value={historyFromDate}
+                onChange={e => setHistoryFromDate(e.target.value)}
+              />
+              <label>Đến ngày</label>
+              <input
+                type="date"
+                value={historyToDate}
+                onChange={e => setHistoryToDate(e.target.value)}
+              />
+              {(historyFromDate || historyToDate) && (
+                <button
+                  className="historyDateClearBtn"
+                  onClick={() => { setHistoryFromDate(''); setHistoryToDate(''); }}
+                >
+                  Xóa
+                </button>
+              )}
+            </div>
+
             <p className="historyResultCount">
               {filteredHistory.length === history.length
                 ? `${history.length} giao dịch`
@@ -3074,7 +3120,7 @@ export default function App() {
                 <p>Không tìm thấy giao dịch nào phù hợp.</p>
                 <button
                   className="historyClearFilterBtn"
-                  onClick={() => { setHistoryQuery(''); setHistoryTypeFilter(''); }}
+                  onClick={() => { setHistoryQuery(''); setHistoryTypeFilter(''); setHistoryFromDate(''); setHistoryToDate(''); }}
                 >
                   Xoá bộ lọc
                 </button>
@@ -3130,6 +3176,24 @@ export default function App() {
                 Xuất Excel
               </button>
             </div>
+          </div>
+
+          {/* Period filter */}
+          <div className="statsPeriodFilter">
+            {[
+              { value: '1m',  label: 'Tháng này' },
+              { value: '3m',  label: '3 tháng' },
+              { value: '6m',  label: '6 tháng' },
+              { value: 'all', label: 'Tất cả' },
+            ].map(({ value, label }) => (
+              <button
+                key={value}
+                className={`statsPeriodBtn ${statsPeriod === value ? 'active' : ''}`}
+                onClick={() => setStatsPeriod(value)}
+              >
+                {label}
+              </button>
+            ))}
           </div>
 
           {/* KPI Cards */}
