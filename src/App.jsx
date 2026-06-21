@@ -860,7 +860,7 @@ const PRODUCT_PHOTOS = {
   // DJI
   '40490': 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/DJI_Osmo_Pocket_3_-_1.jpg/600px-DJI_Osmo_Pocket_3_-_1.jpg',
   '54490': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/2024_Dron_DJI_Mini_4_Pro_%2801%29.jpg/600px-2024_Dron_DJI_Mini_4_Pro_%2801%29.jpg',
-  '55490': 'https://dji-official-fe.djicdn.com/dps/2a6b0dfad4c90c7fc543f8d1c9f32df5.jpg',
+  '55490': '/images/dji_rs4_pro.png',
   // NIKON
   '41490': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Nikon_Z_fc_3_aug_2021a.jpg/600px-Nikon_Z_fc_3_aug_2021a.jpg',
   '56490': 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Nikon_Z30.jpg/600px-Nikon_Z30.jpg',
@@ -875,7 +875,7 @@ const PRODUCT_PHOTOS = {
   '44490': 'https://www.tamron.com/jp/consumer/pc_file/file/a063_01_pc.png',
   '60490': 'https://www.tamron.com/jp/consumer/pc_file/file/a046_img01.jpg',
   // VILTROX
-  '45490': 'https://viltrox.com/cdn/shop/files/AF85mm_F1.8_Z-780735.png?v=1718595016',
+  '45490': '/images/viltrox_85mm.png',
   '61490': 'https://viltrox.com/cdn/shop/files/AF56mm_F1.4_XF-789704.png?v=1722921088',
   // LEICA
   '46490': 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Leica_Q2_-_front_view_-_by_Henry_S%C3%B6derlund_%2852561697609%29.jpg/600px-Leica_Q2_-_front_view_-_by_Henry_S%C3%B6derlund_%2852561697609%29.jpg',
@@ -884,7 +884,7 @@ const PRODUCT_PHOTOS = {
   '47490': 'https://store-na.hasselblad.com/cdn/shop/files/X2D_692x692_4x_cecaf8af-26d4-461a-9eaa-7f90ea4647ab_330x330.png',
   '63490': 'https://store-na.hasselblad.com/cdn/shop/files/907X.jpg',
   // PHỤ KIỆN
-  '48490': 'https://www.peakdesign.com/cdn/shop/files/TT-CB-5-150-C-1.jpg?v=1689285879',
+  '48490': '/images/peak_design_tripod.png',
   '66490': 'https://strobepro.com/cdn/shop/files/Godox_V1_Pro_flash_speedlite_strobepro_1_f860482f-6262-4db9-83dd-8643411caec0_5000x.jpg?v=1705606862',
   '67490': 'https://cdn.lowepro.com/media/catalog/product/cache/29dcb5ccf179293005728ddc618b5922/c/a/camera-backpack-lowepro--flipside-iii-lp37352-pww.jpg',
   '68490': 'https://kaseoptics.com/cdn/shop/files/1121600001.jpg?v=1684937445',
@@ -1283,11 +1283,19 @@ export default function App() {
   const [fStaff, setFStaff] = useState(STAFFS[0]);
   const [fCondition, setFCondition] = useState(97);
   const [fBox, setFBox] = useState(false);
-  const [fLens, setFLens] = useState(false);
+  const [fLensName, setFLensName] = useState('');
   const [fAccessories, setFAccessories] = useState('');
   const [fDesc, setFDesc] = useState('');
+  const [fImages, setFImages] = useState([]);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const [productImages, setProductImages] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('nippon_camera_images') || '{}'); }
+    catch { return {}; }
+  });
 
   const [toast, setToast] = useState(null);
+  const [failedImages, setFailedImages] = useState(new Set());
 
   // History search state
   const [historyQuery, setHistoryQuery] = useState('');
@@ -1303,6 +1311,7 @@ export default function App() {
   // FIX #5 & #8: Refs instead of DOM queries
   const toastTimerRef = useRef(null);
   const importFileRef = useRef(null);
+  const imageInputRef = useRef(null);
 
   // Sync to local storage
   useEffect(() => {
@@ -1363,6 +1372,56 @@ export default function App() {
     if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
     setToast({ message, type });
     toastTimerRef.current = setTimeout(() => setToast(null), 3000);
+  };
+
+  const compressImageFile = (file) => new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const MAX = 1200;
+        let w = img.width, h = img.height;
+        if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', 0.75));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  const handleImageFiles = (files) => {
+    const allowed = Array.from(files).filter(f => f.type.startsWith('image/'));
+    const entries = allowed.map(f => ({
+      id: `img_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+      file: f,
+      name: f.name,
+      size: f.size,
+      preview: URL.createObjectURL(f),
+    }));
+    setFImages(prev => [...prev, ...entries]);
+  };
+
+  const handleImageRemove = (idx) => {
+    setFImages(prev => {
+      URL.revokeObjectURL(prev[idx]?.preview);
+      return prev.filter((_, i) => i !== idx);
+    });
+  };
+
+  const getProductPhoto = (productId) => {
+    const imgs = productImages[productId];
+    if (imgs && imgs.length > 0) return imgs[0];
+    return PRODUCT_PHOTOS[productId] || null;
+  };
+
+  const getProductPhotoList = (productId) => {
+    const imgs = productImages[productId];
+    if (imgs && imgs.length > 0) return imgs;
+    const single = PRODUCT_PHOTOS[productId];
+    return single ? [single] : [];
   };
 
   const formatMoneyRaw = (num) => num.toLocaleString('vi-VN');
@@ -1531,20 +1590,20 @@ export default function App() {
     setCurrentProduct(null);
   };
 
-  // FIX #6: Save full staff name — was incorrectly trimming to last word only
-  const handleAddProduct = (e) => {
+  const handleAddProduct = async (e) => {
     e.preventDefault();
     const newId = 'sku_' + Date.now();
     const newProduct = {
       id: newId,
       brand: fBrand,
       name: fName,
-      specs: `${fColor === '#000000' ? 'Black' : 'Color'}, ${fLens ? 'Kit' : 'Body'}, ${fBox ? 'Fullbox' : 'No box'} / ${newId}`,
+      specs: `${fColor === '#000000' ? 'Black' : 'Color'}, ${fLensName ? `Kit (${fLensName})` : 'Body'}, ${fBox ? 'Fullbox' : 'No box'} / ${newId}`,
       price: parseInt(fPrice, 10),
       status: PRODUCT_STATUS.IN_STOCK,
       color: fColor,
       box: fBox,
-      lens: fLens,
+      lens: fLensName !== '',
+      lensName: fLensName,
       serial: fSerial,
       shotCount: fShot,
       accessories: fAccessories,
@@ -1554,6 +1613,15 @@ export default function App() {
       description: fDesc,
       dateAdded: new Date().toISOString()
     };
+
+    if (fImages.length > 0) {
+      const compressed = await Promise.all(fImages.map(img => compressImageFile(img.file)));
+      const updatedImages = { ...productImages, [newId]: compressed };
+      setProductImages(updatedImages);
+      localStorage.setItem('nippon_camera_images', JSON.stringify(updatedImages));
+      fImages.forEach(img => URL.revokeObjectURL(img.preview));
+      setFImages([]);
+    }
 
     setProducts(prev => [...prev, newProduct]);
     addLog(
@@ -1574,7 +1642,7 @@ export default function App() {
     setFAccessories('');
     setFDesc('');
     setFBox(false);
-    setFLens(false);
+    setFLensName('');
 
     setCurrentBrand(fBrand);
     setCurrentProduct(null);
@@ -1846,7 +1914,7 @@ export default function App() {
 
   const handleExportDB = () => {
     triggerJsonDownload(
-      { products, history },
+      { products, history, images: productImages },
       `nippon_camera_db_${new Date().toISOString().slice(0, 10)}.json`
     );
     showToast('Đã kết xuất dữ liệu bảng giá thành công!');
@@ -1863,6 +1931,10 @@ export default function App() {
         if (db && Array.isArray(db.products) && Array.isArray(db.history)) {
           setProducts(db.products);
           setHistory(db.history);
+          if (db.images && typeof db.images === 'object') {
+            setProductImages(db.images);
+            localStorage.setItem('nippon_camera_images', JSON.stringify(db.images));
+          }
           showToast('Đã nhập cơ sở dữ liệu thành công!', 'success');
         } else {
           showToast('Định dạng file sao lưu không hợp lệ!', 'error');
@@ -2154,8 +2226,15 @@ export default function App() {
                         }}
                       >
                         <div className="productCardImage">
-                          {PRODUCT_PHOTOS[p.id]
-                            ? <img src={PRODUCT_PHOTOS[p.id]} alt={p.name} className="productCardImg" loading="lazy" />
+                          {getProductPhoto(p.id) && !failedImages.has(p.id)
+                            ? <img
+                                src={getProductPhoto(p.id)}
+                                alt={p.name}
+                                className="productCardImg"
+                                loading="lazy"
+                                referrerPolicy="no-referrer"
+                                onError={() => setFailedImages(prev => new Set([...prev, p.id]))}
+                              />
                             : <svg className="placeholder-img-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                                 <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
                                 <circle cx="8.5" cy="8.5" r="1.5"/>
@@ -2290,22 +2369,31 @@ export default function App() {
                 {/* Right Gallery */}
                 <div className="detailGallery">
                   <div className="thumbColumn">
-                    {[0, 1, 2].map(idx => (
-                      <div
-                        key={idx}
-                        className={`thumbItem ${idx === activeThumbIndex ? 'active' : ''}`}
-                        onClick={() => setActiveThumbIndex(idx)}
-                      >
-                        {idx === 0 && PRODUCT_PHOTOS[currentProduct.id]
-                          ? <img src={PRODUCT_PHOTOS[currentProduct.id]} alt="" />
-                          : <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                              <circle cx="8.5" cy="8.5" r="1.5"/>
-                              <polyline points="21 15 16 10 5 21"/>
-                            </svg>
-                        }
-                      </div>
-                    ))}
+                    {[0, 1, 2].map(idx => {
+                      const photos = getProductPhotoList(currentProduct.id);
+                      const src = photos[idx];
+                      return (
+                        <div
+                          key={idx}
+                          className={`thumbItem ${idx === activeThumbIndex ? 'active' : ''}`}
+                          onClick={() => src && setActiveThumbIndex(idx)}
+                        >
+                          {src && !failedImages.has(`${currentProduct.id}_${idx}`)
+                            ? <img
+                                src={src}
+                                alt=""
+                                referrerPolicy="no-referrer"
+                                onError={() => setFailedImages(prev => new Set([...prev, `${currentProduct.id}_${idx}`]))}
+                              />
+                            : <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                <circle cx="8.5" cy="8.5" r="1.5"/>
+                                <polyline points="21 15 16 10 5 21"/>
+                              </svg>
+                          }
+                        </div>
+                      );
+                    })}
                   </div>
 
                   <div className="mainImageWrapper">
@@ -2313,18 +2401,23 @@ export default function App() {
                       {STATUS_DISPLAY[currentProduct.status]?.text}
                     </div>
                     <div className="mainImageContainer">
-                      {PRODUCT_PHOTOS[currentProduct.id]
-                        ? <img
-                            src={PRODUCT_PHOTOS[currentProduct.id]}
-                            alt={`${currentProduct.brand} ${currentProduct.name}`}
-                            className="mainImage"
-                          />
-                        : <svg className="placeholder-img-icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                            <circle cx="8.5" cy="8.5" r="1.5"/>
-                            <polyline points="21 15 16 10 5 21"/>
-                          </svg>
-                      }
+                      {(() => {
+                        const photos = getProductPhotoList(currentProduct.id);
+                        const src = photos[activeThumbIndex];
+                        return src && !failedImages.has(`${currentProduct.id}_${activeThumbIndex}`)
+                          ? <img
+                              src={src}
+                              alt={`${currentProduct.brand} ${currentProduct.name}`}
+                              className="mainImage"
+                              referrerPolicy="no-referrer"
+                              onError={() => setFailedImages(prev => new Set([...prev, `${currentProduct.id}_${activeThumbIndex}`]))}
+                            />
+                          : <svg className="placeholder-img-icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
+                              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                              <circle cx="8.5" cy="8.5" r="1.5"/>
+                              <polyline points="21 15 16 10 5 21"/>
+                            </svg>;
+                      })()}
                     </div>
                   </div>
                 </div>
@@ -2571,180 +2664,228 @@ export default function App() {
       {/* ── SUBVIEW: NHẬP LIỆU ── */}
       {currentTab === 'nhap-lieu' && (
         <div id="nhap-lieu-view">
-          <div className="viewHeader">
-            <h2>NHẬP KHO MÁY CŨ MỚI</h2>
-            <p className="viewSubtitle">Điền đầy đủ thông tin để nhập kho sản phẩm cũ vào bảng giá hệ thống.</p>
+          {/* Header */}
+          <div className="entryPageHeader">
+            <h2 className="entryPageTitle">CÔNG CỤ NHẬP LIỆU HÀNG CŨ</h2>
+            <div className="entryLocationPill">
+              <span className="entryLocationLabel">Vị trí</span>
+              <select value={fLocation} onChange={e => setFLocation(e.target.value)} className="entryLocationSelect">
+                {LOCATIONS.map(l => <option key={l} value={l}>{l}</option>)}
+              </select>
+            </div>
           </div>
 
-          <form onSubmit={handleAddProduct} className="entryForm">
-            <div className="formGrid">
-              <div className="formGroup">
-                <label htmlFor="f-brand">Thương hiệu *</label>
-                <select id="f-brand" value={fBrand} onChange={(e) => setFBrand(e.target.value)}>
-                  {Object.keys(BRAND_SLOGANS).map(b => (
-                    <option key={b} value={b}>{b}</option>
-                  ))}
+          <div className="entryBody">
+            {/* ── LEFT: image upload ── */}
+            <div className="entryLeft">
+              {/* Brand / Danh mục */}
+              <div className="entryFieldBlock">
+                <span className="entryFieldLabel">Danh mục</span>
+                <select className="entrySelect" value={fBrand} onChange={e => setFBrand(e.target.value)}>
+                  {Object.keys(BRAND_SLOGANS).map(b => <option key={b} value={b}>{b}</option>)}
                 </select>
               </div>
 
-              <div className="formGroup">
-                <label htmlFor="f-name">Tên model *</label>
+              {/* Drop zone */}
+              <div
+                className={`uploadZone${isDragging ? ' dragging' : ''}`}
+                onDragOver={e => { e.preventDefault(); setIsDragging(true); }}
+                onDragLeave={() => setIsDragging(false)}
+                onDrop={e => { e.preventDefault(); setIsDragging(false); handleImageFiles(e.dataTransfer.files); }}
+                onClick={() => imageInputRef.current?.click()}
+              >
+                <svg className="uploadZoneIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
+                  <rect x="3" y="3" width="18" height="18" rx="2"/>
+                  <circle cx="8.5" cy="8.5" r="1.5"/>
+                  <polyline points="21 15 16 10 5 21"/>
+                </svg>
+                <svg className="uploadArrowIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                </svg>
+                <p className="uploadZoneText">Kéo thả file vào đây, hoặc bấm chọn</p>
                 <input
-                  type="text"
-                  id="f-name"
-                  placeholder="Ví dụ: X-M5, EOS R6 II..."
-                  value={fName}
-                  onChange={(e) => setFName(e.target.value)}
-                  required
+                  ref={imageInputRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  style={{ display: 'none' }}
+                  onChange={e => { handleImageFiles(e.target.files); e.target.value = ''; }}
                 />
               </div>
 
-              <div className="formGroup">
-                <label htmlFor="f-color">Màu sắc *</label>
-                <div className="colorInputWrapper">
+              {/* File list */}
+              {fImages.map((img, idx) => (
+                <div key={img.id} className="uploadFileItem">
+                  <div className="uploadFileThumbnail">
+                    <img src={img.preview} alt="" />
+                  </div>
+                  <div className="uploadFileInfo">
+                    <span className="uploadFileName">{img.name}</span>
+                    <span className="uploadFileSize">{Math.round(img.size / 1024)} KB</span>
+                  </div>
+                  <button
+                    type="button"
+                    className="uploadFileRemove"
+                    onClick={() => handleImageRemove(idx)}
+                  >✕</button>
+                </div>
+              ))}
+            </div>
+
+            {/* ── RIGHT: form fields ── */}
+            <div className="entryRight">
+              <form onSubmit={handleAddProduct} className="entryForm2">
+                {/* Tên máy */}
+                <input
+                  className="entryInput"
+                  type="text"
+                  placeholder="Nhập tên máy  Vd: X-M5"
+                  value={fName}
+                  onChange={e => setFName(e.target.value)}
+                  required
+                />
+
+                {/* Màu sắc + Serial */}
+                <div className="entryInlineRow">
+                  <span className="entryInlineLabel">Màu sắc</span>
+                  <label className="colorCircleLabel">
+                    <span className="colorCirclePreview" style={{ background: fColor }} />
+                    <input
+                      type="color"
+                      value={fColor}
+                      onChange={e => setFColor(e.target.value)}
+                      className="colorCircleInput"
+                    />
+                  </label>
+                  <span className="entryInlineLabel">Serial</span>
                   <input
-                    type="color"
-                    id="f-color"
-                    value={fColor}
-                    onChange={(e) => setFColor(e.target.value)}
-                  />
-                  <input
+                    className="entryInput entryInputSmall"
                     type="text"
-                    id="f-color-text"
-                    value={fColor}
-                    onChange={(e) => setFColor(e.target.value)}
-                    placeholder="#000000"
+                    placeholder="Nhập Serial"
+                    value={fSerial}
+                    onChange={e => setFSerial(e.target.value)}
                   />
                 </div>
-              </div>
 
-              <div className="formGroup">
-                <label htmlFor="f-price">Giá bán (VNĐ) *</label>
-                <input
-                  type="number"
-                  id="f-price"
-                  placeholder="Ví dụ: 21990000"
-                  value={fPrice}
-                  onChange={(e) => setFPrice(e.target.value)}
-                  required
-                />
-              </div>
+                {/* Box */}
+                <div className="entryInlineRow">
+                  <span className="entryInlineLabel">Box</span>
+                  <label className="entryRadioLabel">
+                    <input
+                      type="radio"
+                      name="fBox"
+                      checked={!fBox}
+                      onChange={() => setFBox(false)}
+                      className="entryRadio"
+                    />
+                    Không box
+                  </label>
+                  <label className="entryRadioLabel">
+                    <input
+                      type="radio"
+                      name="fBox"
+                      checked={fBox}
+                      onChange={() => setFBox(true)}
+                      className="entryRadio"
+                    />
+                    Có box
+                  </label>
+                </div>
 
-              <div className="formGroup">
-                <label htmlFor="f-serial">Mã Serial *</label>
-                <input
-                  type="text"
-                  id="f-serial"
-                  placeholder="Ví dụ: 37428"
-                  value={fSerial}
-                  onChange={(e) => setFSerial(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="formGroup">
-                <label htmlFor="f-shot">Số shot chụp *</label>
-                <input
-                  type="text"
-                  id="f-shot"
-                  placeholder="Ví dụ: 5.000, 15.000..."
-                  value={fShot}
-                  onChange={(e) => setFShot(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="formGroup">
-                <label htmlFor="f-location">Vị trí kho máy *</label>
-                <select id="f-location" value={fLocation} onChange={(e) => setFLocation(e.target.value)}>
-                  {LOCATIONS.map(l => (
-                    <option key={l} value={l}>{l}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="formGroup">
-                <label htmlFor="f-staff">Nhân viên phụ trách nhập *</label>
-                <select id="f-staff" value={fStaff} onChange={(e) => setFStaff(e.target.value)}>
-                  {STAFFS.map(s => (
-                    <option key={s} value={s}>{s}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="formGroup">
-                <label htmlFor="f-condition">Tình trạng máy (%) *</label>
-                <input
-                  type="number"
-                  id="f-condition"
-                  min="1"
-                  max="100"
-                  value={fCondition}
-                  onChange={(e) => setFCondition(parseInt(e.target.value, 10))}
-                  required
-                />
-              </div>
-
-              <div className="formGroup checkboxGroup">
-                <label>
+                {/* Lens */}
+                <div className="entryInlineRow">
+                  <span className="entryInlineLabel">Lens</span>
                   <input
-                    type="checkbox"
-                    id="f-box"
-                    checked={fBox}
-                    onChange={(e) => setFBox(e.target.checked)}
-                  />{' '}
-                  Máy kèm Hộp (Fullbox)
-                </label>
-                <label>
+                    className="entryInput entryInputFlex"
+                    type="text"
+                    placeholder="Nhập tên lens"
+                    value={fLensName}
+                    onChange={e => setFLensName(e.target.value)}
+                  />
+                </div>
+
+                {/* Shot + Đánh giá */}
+                <div className="entryInlineRow">
+                  <span className="entryInlineLabel">Shot</span>
                   <input
-                    type="checkbox"
-                    id="f-lens"
-                    checked={fLens}
-                    onChange={(e) => setFLens(e.target.checked)}
-                  />{' '}
-                  Máy đi kèm Ống kính (Lens Kit)
-                </label>
-              </div>
-            </div>
+                    className="entryInput entryInputSmall"
+                    type="text"
+                    placeholder="Số shot"
+                    value={fShot}
+                    onChange={e => setFShot(e.target.value)}
+                  />
+                  <span className="entryInlineLabel">Đánh giá</span>
+                  <input
+                    className="entryInput entryInputTiny"
+                    type="number"
+                    min="1"
+                    max="100"
+                    value={fCondition}
+                    onChange={e => setFCondition(parseInt(e.target.value, 10))}
+                  />
+                  <span className="entryInlineLabel">%</span>
+                </div>
 
-            <div className="formGroup fullWidth">
-              <label htmlFor="f-accessories">Danh sách phụ kiện kèm theo *</label>
-              <input
-                type="text"
-                id="f-accessories"
-                placeholder="Ví dụ: Sạc, Pin, Dây đeo, Thẻ nhớ..."
-                value={fAccessories}
-                onChange={(e) => setFAccessories(e.target.value)}
-                required
-              />
-            </div>
+                {/* Phụ kiện */}
+                <div className="entryInlineRow">
+                  <span className="entryInlineLabel">Phụ kiện</span>
+                  <input
+                    className="entryInput entryInputFlex"
+                    type="text"
+                    placeholder="Không có thì để trống"
+                    value={fAccessories}
+                    onChange={e => setFAccessories(e.target.value)}
+                  />
+                </div>
 
-            <div className="formGroup fullWidth">
-              <label htmlFor="f-desc">Mô tả ngắn tình trạng ngoại hình *</label>
-              <textarea
-                id="f-desc"
-                rows="3"
-                placeholder="Ví dụ: Ngoại hình trầy nhẹ góc, báng cầm hơi ố, thấu kính sạch..."
-                value={fDesc}
-                onChange={(e) => setFDesc(e.target.value)}
-                required
-              ></textarea>
-            </div>
+                {/* Giá */}
+                <div className="entryInlineRow">
+                  <span className="entryInlineLabel">Giá bán</span>
+                  <input
+                    className="entryInput entryInputFlex"
+                    type="number"
+                    placeholder="VD: 21990000"
+                    value={fPrice}
+                    onChange={e => setFPrice(e.target.value)}
+                    required
+                  />
+                </div>
 
-            <button type="submit" className="submitBtn">LƯU SẢN PHẨM</button>
-          </form>
+                {/* Nhân viên */}
+                <div className="entryInlineRow">
+                  <span className="entryInlineLabel">Nhân viên</span>
+                  <select className="entrySelect entryInputFlex" value={fStaff} onChange={e => setFStaff(e.target.value)}>
+                    {STAFFS.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
+
+                {/* Mô tả ngắn */}
+                <div className="entryDescBlock">
+                  <span className="entryDescLabel">Mô tả ngắn:</span>
+                  <textarea
+                    className="entryTextarea"
+                    rows="3"
+                    placeholder="Tình trạng nhìn bằng mắt thường ra sao"
+                    value={fDesc}
+                    onChange={e => setFDesc(e.target.value)}
+                  />
+                </div>
+
+                <button type="submit" className="entrySubmitBtn">NHẬP VÀO</button>
+              </form>
+            </div>
+          </div>
 
           {/* Backup Database */}
           <div className="backupRestoreSection">
             <h3>SAO LƯU & ĐỒNG BỘ DỮ LIỆU</h3>
             <p className="backupText">
-              Vì hệ thống vận hành hoàn toàn phía máy khách (Client-side), bạn có thể xuất cơ sở dữ liệu làm file JSON để gửi cho nhân viên chi nhánh khác, hoặc nhập file JSON nhận được để cập nhật bảng giá.
+              Vì hệ thống vận hành hoàn toàn phía máy khách (Client-side), bạn có thể xuất cơ sở dữ liệu làm file JSON (bao gồm hình ảnh) để gửi cho nhân viên chi nhánh khác, hoặc nhập file JSON nhận được để cập nhật bảng giá.
             </p>
             <div className="backupActions">
               <button type="button" className="backupBtn btnExport" onClick={handleExportDB}>
                 XUẤT DỮ LIỆU JSON
               </button>
-              {/* FIX #8: useRef instead of document.getElementById */}
               <button
                 type="button"
                 className="backupBtn btnImport"

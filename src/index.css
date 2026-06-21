@@ -1160,6 +1160,386 @@ body {
   color: #ffffff;
 }
 
+/* ── 6b. NEW ENTRY FORM (CÔNG CỤ NHẬP LIỆU) ── */
+.entryPageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.entryPageTitle {
+  font-family: var(--font-heading);
+  font-size: 26px;
+  font-weight: 900;
+  color: var(--brand-dark);
+  margin: 0;
+}
+
+.entryLocationPill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1.5px solid var(--border-light);
+  border-radius: 10px;
+  padding: 8px 14px;
+  background: #fff;
+}
+
+.entryLocationLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary-light);
+}
+
+.entryLocationSelect {
+  border: none;
+  outline: none;
+  font-family: var(--font-primary);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--brand-dark);
+  background: transparent;
+  cursor: pointer;
+}
+
+.entryBody {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  background: #fff;
+  border: 1px solid var(--border-light);
+  border-radius: 16px;
+  padding: 28px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-sm);
+}
+
+/* LEFT column */
+.entryLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.entryFieldBlock {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.entryFieldLabel {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--brand-dark);
+  white-space: nowrap;
+  min-width: 64px;
+}
+
+.entrySelect {
+  flex: 1;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border-light);
+  background: var(--bg-light);
+  font-family: var(--font-primary);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--brand-dark);
+  outline: none;
+  cursor: pointer;
+}
+
+.entrySelect:focus {
+  border-color: var(--brand-red);
+}
+
+/* Upload zone */
+.uploadZone {
+  border: 2px dashed #c8c8c8;
+  border-radius: 12px;
+  padding: 32px 20px;
+  text-align: center;
+  cursor: pointer;
+  background: #f7f7f7;
+  transition: border-color 0.2s, background 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.uploadZone:hover,
+.uploadZone.dragging {
+  border-color: var(--brand-red);
+  background: #fff8f8;
+}
+
+.uploadZoneIcon {
+  width: 48px;
+  height: 48px;
+  color: #b0b0b0;
+}
+
+.uploadArrowIcon {
+  width: 22px;
+  height: 22px;
+  color: #888;
+  margin-top: 2px;
+}
+
+.uploadZoneText {
+  font-size: 13px;
+  color: #888;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* File list items */
+.uploadFileItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.uploadFileThumbnail {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #eee;
+  flex-shrink: 0;
+}
+
+.uploadFileThumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.uploadFileInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.uploadFileName {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--brand-dark);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.uploadFileSize {
+  font-size: 12px;
+  color: var(--text-secondary-light);
+}
+
+.uploadFileRemove {
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: #aaa;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+
+.uploadFileRemove:hover {
+  color: var(--brand-red);
+}
+
+/* RIGHT column form */
+.entryRight {
+  display: flex;
+  flex-direction: column;
+}
+
+.entryForm2 {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+}
+
+.entryInput {
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border-light);
+  background: var(--bg-light);
+  font-family: var(--font-primary);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--brand-dark);
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.entryInput:focus {
+  border-color: var(--brand-red);
+  background: #fff;
+}
+
+.entryInput::placeholder {
+  color: #bbb;
+}
+
+.entryInputSmall {
+  width: 90px !important;
+  flex: none !important;
+}
+
+.entryInputTiny {
+  width: 60px !important;
+  flex: none !important;
+}
+
+.entryInputFlex {
+  flex: 1 !important;
+  width: auto !important;
+}
+
+/* Inline rows */
+.entryInlineRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.entryInlineLabel {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--brand-dark);
+  white-space: nowrap;
+}
+
+/* Color circle picker */
+.colorCircleLabel {
+  position: relative;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+}
+
+.colorCirclePreview {
+  display: block;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid #ddd;
+  cursor: pointer;
+}
+
+.colorCircleInput {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+/* Radio buttons */
+.entryRadioLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--brand-dark);
+  cursor: pointer;
+}
+
+.entryRadio {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent-green);
+  cursor: pointer;
+}
+
+/* Description block */
+.entryDescBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.entryDescLabel {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--brand-dark);
+}
+
+.entryTextarea {
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border-light);
+  background: var(--bg-light);
+  font-family: var(--font-primary);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--brand-dark);
+  outline: none;
+  resize: vertical;
+  flex: 1;
+  min-height: 70px;
+}
+
+.entryTextarea:focus {
+  border-color: var(--brand-red);
+  background: #fff;
+}
+
+.entryTextarea::placeholder {
+  color: #bbb;
+}
+
+/* Submit button */
+.entrySubmitBtn {
+  width: 100%;
+  height: 48px;
+  border-radius: 10px;
+  border: none;
+  background-color: var(--brand-dark);
+  color: #fff;
+  font-family: var(--font-primary);
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  transition: background-color 0.2s;
+  margin-top: auto;
+}
+
+.entrySubmitBtn:hover {
+  background-color: #333;
+}
+
+@media (max-width: 700px) {
+  .entryBody {
+    grid-template-columns: 1fr;
+  }
+  .entryPageHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
 /* ── 7. TIMELINE HISTORY VIEW (LỊCH SỬ) ── */
 .historyTimeline {
   display: flex;
