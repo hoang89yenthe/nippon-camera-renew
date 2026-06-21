@@ -1394,6 +1394,7 @@ export default function App() {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [releaseConfirmOpen, setReleaseConfirmOpen] = useState(false);
   const [mReleaseStaff, setMReleaseStaff] = useState(STAFFS[0]);
+  const [resetDemoModalOpen, setResetDemoModalOpen] = useState(false);
 
   // FIX #5 & #8: Refs instead of DOM queries
   const toastTimerRef = useRef(null);
@@ -2102,6 +2103,14 @@ export default function App() {
       `nippon_camera_db_${new Date().toISOString().slice(0, 10)}.json`
     );
     showToast('Đã kết xuất dữ liệu bảng giá thành công!');
+  };
+
+  const handleResetDemoData = () => {
+    localStorage.removeItem('nippon_camera_products');
+    localStorage.removeItem('nippon_camera_history');
+    localStorage.removeItem('nippon_camera_images');
+    // Reload so the app re-seeds from INITIAL_PRODUCTS / INITIAL_HISTORY
+    window.location.reload();
   };
 
   const handleImportDB = (e) => {
@@ -3426,7 +3435,17 @@ export default function App() {
                 style={{ display: 'none' }}
                 onChange={handleImportDB}
               />
+              <button
+                type="button"
+                className="backupBtn btnResetDemo"
+                onClick={() => setResetDemoModalOpen(true)}
+              >
+                KHÔI PHỤC DỮ LIỆU DEMO
+              </button>
             </div>
+            <p className="backupHint">
+              "Khôi phục dữ liệu demo" sẽ xoá toàn bộ dữ liệu hiện có trên thiết bị này và nạp lại bộ dữ liệu mẫu ban đầu. Hãy xuất JSON trước nếu bạn đang có dữ liệu thật.
+            </p>
           </div>
         </div>
       )}
@@ -4117,6 +4136,37 @@ export default function App() {
               </button>
               <button className="modalSubmitBtn btnDeleteConfirm" onClick={handleDeleteProduct}>
                 XOÁ
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* RESET DEMO DATA CONFIRMATION MODAL */}
+      {resetDemoModalOpen && (
+        <div className="modalOverlay" id="reset-demo-modal">
+          <div className="modalBox deleteModalBox">
+            <button className="modalCloseBtn" onClick={() => setResetDemoModalOpen(false)}>✕</button>
+
+            <div className="deleteModalIcon">
+              <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" strokeWidth="1.8">
+                <polyline points="1 4 1 10 7 10"/>
+                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+              </svg>
+            </div>
+
+            <h3 className="deleteModalTitle">Khôi phục dữ liệu demo</h3>
+            <p className="deleteModalDesc">
+              Toàn bộ dữ liệu hiện có trên thiết bị này (sản phẩm, lịch sử, hình ảnh) sẽ bị <strong>xoá</strong> và thay bằng bộ dữ liệu mẫu ban đầu.
+              <br/>Hành động này không thể hoàn tác.
+            </p>
+
+            <div className="deleteModalActions">
+              <button className="cancelEditBtn" onClick={() => setResetDemoModalOpen(false)}>
+                HỦY
+              </button>
+              <button className="modalSubmitBtn btnDeleteConfirm" onClick={handleResetDemoData}>
+                KHÔI PHỤC
               </button>
             </div>
           </div>

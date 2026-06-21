@@ -1350,6 +1350,24 @@ body {
   color: #ffffff;
 }
 
+.btnResetDemo {
+  background-color: #ffffff;
+  border: 1px solid var(--brand-red);
+  color: var(--brand-red);
+}
+
+.btnResetDemo:hover {
+  background-color: var(--brand-red);
+  color: #ffffff;
+}
+
+.backupHint {
+  margin: 14px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-secondary-light);
+}
+
 /* ── 6b. NEW ENTRY FORM (CÔNG CỤ NHẬP LIỆU) ── */
 .entryPageHeader {
   display: flex;
