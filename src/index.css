@@ -1546,6 +1546,16 @@ body {
   }
 }
 
+/* Clickable main image in product detail */
+.mainImageClickable {
+  cursor: zoom-in;
+  transition: opacity 0.15s;
+}
+
+.mainImageClickable:hover {
+  opacity: 0.92;
+}
+
 /* Lightbox preview */
 .lightboxOverlay {
   position: fixed;
@@ -1597,6 +1607,48 @@ body {
 
 .lightboxClose:hover {
   background: rgba(255,255,255,0.3);
+}
+
+.lightboxNav {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255,255,255,0.15);
+  border: none;
+  color: #fff;
+  font-size: 48px;
+  line-height: 1;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+  z-index: 10000;
+  padding-bottom: 4px;
+}
+
+.lightboxNav:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+.lightboxNavPrev { left: 20px; }
+.lightboxNavNext { right: 20px; }
+
+.lightboxCounter {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.5);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 6px 16px;
+  border-radius: 20px;
+  letter-spacing: 0.05em;
 }
 
 /* ── 7. TIMELINE HISTORY VIEW (LỊCH SỬ) ── */

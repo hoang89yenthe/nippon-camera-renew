@@ -2409,8 +2409,9 @@ export default function App() {
                           ? <img
                               src={src}
                               alt={`${currentProduct.brand} ${currentProduct.name}`}
-                              className="mainImage"
+                              className="mainImage mainImageClickable"
                               referrerPolicy="no-referrer"
+                              onClick={() => setPreviewImage({ photos, index: activeThumbIndex })}
                               onError={() => setFailedImages(prev => new Set([...prev, `${currentProduct.id}_${activeThumbIndex}`]))}
                             />
                           : <svg className="placeholder-img-icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
@@ -2719,14 +2720,14 @@ export default function App() {
                 <div key={img.id} className="uploadFileItem">
                   <div
                     className="uploadFileThumbnail"
-                    onClick={() => setPreviewImage(img.preview)}
+                    onClick={() => setPreviewImage({ photos: fImages.map(i => i.preview), index: idx })}
                     title="Bấm để xem ảnh lớn"
                   >
                     <img src={img.preview} alt="" />
                   </div>
                   <div
                     className="uploadFileInfo"
-                    onClick={() => setPreviewImage(img.preview)}
+                    onClick={() => setPreviewImage({ photos: fImages.map(i => i.preview), index: idx })}
                     style={{ cursor: 'pointer' }}
                   >
                     <span className="uploadFileName">{img.name}</span>
@@ -2915,17 +2916,44 @@ export default function App() {
       )}
 
       {/* ── IMAGE PREVIEW LIGHTBOX ── */}
-      {previewImage && (
-        <div className="lightboxOverlay" onClick={() => setPreviewImage(null)}>
-          <button className="lightboxClose" onClick={() => setPreviewImage(null)}>✕</button>
-          <img
-            className="lightboxImg"
-            src={previewImage}
-            alt="preview"
-            onClick={e => e.stopPropagation()}
-          />
-        </div>
-      )}
+      {previewImage && (() => {
+        const { photos, index } = previewImage;
+        const src = photos[index];
+        const hasPrev = index > 0;
+        const hasNext = index < photos.length - 1;
+        return (
+          <div className="lightboxOverlay" onClick={() => setPreviewImage(null)}>
+            <button className="lightboxClose" onClick={() => setPreviewImage(null)}>✕</button>
+
+            {hasPrev && (
+              <button
+                className="lightboxNav lightboxNavPrev"
+                onClick={e => { e.stopPropagation(); setPreviewImage({ photos, index: index - 1 }); }}
+              >‹</button>
+            )}
+
+            <img
+              className="lightboxImg"
+              src={src}
+              alt="preview"
+              onClick={e => e.stopPropagation()}
+            />
+
+            {hasNext && (
+              <button
+                className="lightboxNav lightboxNavNext"
+                onClick={e => { e.stopPropagation(); setPreviewImage({ photos, index: index + 1 }); }}
+              >›</button>
+            )}
+
+            {photos.length > 1 && (
+              <div className="lightboxCounter" onClick={e => e.stopPropagation()}>
+                {index + 1} / {photos.length}
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
       {/* ── SUBVIEW: LỊCH SỬ GIAO DỊCH ── */}
       {currentTab === 'lich-su' && (
